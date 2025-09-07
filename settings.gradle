@@ -1,0 +1,42 @@
+pluginManagement {
+    repositories {
+        // 阿里云Google镜像（优先）
+        maven {
+            url = uri("https://maven.aliyun.com/repository/google")
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        // 阿里云中央仓库镜像
+        maven {
+            url = uri("https://maven.aliyun.com/repository/maven-central")
+        }
+        // 阿里云Gradle插件仓库镜像
+        maven {
+            url = uri("https://maven.aliyun.com/repository/gradle-plugin")
+        }
+        // 保留官方仓库作为后备
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        // 阿里云镜像
+        maven { url = uri("https://maven.aliyun.com/repository/google") }
+        maven { url = uri("https://maven.aliyun.com/repository/maven-central") }
+        //maven { url = uri("https://maven.aliyun.com/repository/jcenter") } // 兼容旧依赖
+        // 官方仓库
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "ReaderAndroid"
+include ':app'
+
+include ':model'
