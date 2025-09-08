@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object AppNet {
-    private const val BASE_URL = "localhost:8080/"
+    private const val BASE_URL = "http://192.168.1.2:8080"
 
     // 创建日志拦截器
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -30,10 +30,7 @@ object AppNet {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-//    // 创建 API 服务实例
-//    val userProfileNetRepo: UserProfileNetRepo by lazy {
-//        retrofit.create(UserProfileNetRepo::class.java)
-//    }
+
 
     fun userNao(): UserNao{
         return retrofit.create(UserNao::class.java)

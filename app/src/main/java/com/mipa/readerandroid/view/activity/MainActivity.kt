@@ -1,6 +1,8 @@
 package com.mipa.readerandroid.view.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -30,8 +32,16 @@ import androidx.compose.ui.unit.sp
 import com.mipa.model.UserProfileViewModel
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.base.AbsActivity
-import com.mipa.readerandroid.view.compose.RegistrationScreen
+import com.mipa.readerandroid.model.dto.UserLoginRequest
+import com.mipa.readerandroid.model.dto.UserRegisterRequest
+import com.mipa.readerandroid.service.UserService
+import com.mipa.readerandroid.view.compose.registrationScreen
 import com.mipa.readerandroid.ui.theme.ReaderAndroidTheme
+import com.mipa.readerandroid.view.compose.AuthNavigation
+import com.mipa.readerandroid.view.compose.PersonalProfileScreen
+import com.mipa.readerandroid.view.compose.loginScreen
+import com.mipa.readerandroid.view.composedata.LoginPageCD
+import com.mipa.readerandroid.view.composedata.RegisterPageCD
 
 class MainActivity :AbsActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +49,10 @@ class MainActivity :AbsActivity() {
         enableEdgeToEdge()
         setContent {
             ReaderAndroidTheme {
-                TestViewModel(UserProfileViewModel())
+                PersonalProfilePreview()
             }
         }
+        startActivity(Intent(this, RegisterAndLoginActivity::class.java))
     }
 }
 
@@ -57,66 +68,7 @@ fun TestViewModel(viewModel: UserProfileViewModel){
 
 }
 
-@Composable
-fun PersonalProfileScreen() {
-    Row(
-        modifier = Modifier
-            .height(120.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.Top
-    ) {
-        // 左侧圆形头像
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.profile_avatar), // 确保在res/drawable目录下有此图片
-                contentDescription = "个人头像",
-                modifier = Modifier.fillMaxSize()
-            )
-        }
 
-        Spacer(modifier = Modifier.width(24.dp))
-
-        // 右侧个人信息文本
-        Column(
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "张三",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Android 开发工程师",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "zhang.san@example.com",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "+86 138 **** 5678",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -126,12 +78,5 @@ fun PersonalProfilePreview() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun showRegister(){
-    ReaderAndroidTheme {
-        RegistrationScreen {  }
-    }
-}
 
 

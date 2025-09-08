@@ -6,7 +6,7 @@ class Domain {
         const val publicPrefix = "/api/public"
         const val privatePrefix = "/api/private"
 
-        const val authPublic = "${publicPrefix}/auth/"
-        const val authPrivate = "${privatePrefix}/auth/"
+        const val authPublic = "${publicPrefix}/auth"
+        const val authPrivate = "${privatePrefix}/auth"
     }
 }

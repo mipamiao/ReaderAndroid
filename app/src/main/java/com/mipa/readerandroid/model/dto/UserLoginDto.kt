@@ -1,11 +1,8 @@
 package com.mipa.readerandroid.model.dto
 
-import androidx.compose.ui.semantics.Role
-import java.time.LocalDateTime
-
 data class UserLoginRequest(
     val userName:String,
-    val passward: String)
+    val password: String)
 
 data class UserLoginResponse(
     val userId: String,

@@ -15,6 +15,7 @@ import com.mipa.readerandroid.repository.nao.Token
 import com.mipa.readerandroid.repository.nao.TokenMgr
 import com.mipa.readerandroid.service.converter.UserEntityConverter
 import com.mipa.readerandroid.service.converter.UserProfileConverter
+import retrofit2.Call
 
 //todo 将其改造为mao，dao，nao的层次结构，外部无需分开调用，由service本身决定
 object UserService {
@@ -52,11 +53,16 @@ object UserService {
 
     fun login(userLoginRequest: UserLoginRequest): UserProfile? {
         try {
-            val response: ApiResponse<Token<UserLoginResponse>> = userNao.login(userLoginRequest)
-            if (response.isSuccess()) {
-                response.data?.let {
-                    TokenMgr.setToken(it.token)
-                    return UserProfileConverter.fromUserLoginResponse(it.data)
+            val call = userNao.login(userLoginRequest)
+            val response = call.execute()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    if (it.isSuccess()) {
+                        it.data?.let { data ->
+                            TokenMgr.setToken(data.token)
+                            return UserProfileConverter.fromUserLoginResponse(data.data)
+                        }
+                    }
                 }
             }
             return null
@@ -68,8 +74,12 @@ object UserService {
 
     fun register(userRegisterRequest: UserRegisterRequest): Boolean {
         try {
-            val response = userNao.register(userRegisterRequest)
-            return response.isSuccess()
+            val call = userNao.register(userRegisterRequest)
+            val response = call.execute()
+            response.body()?.let {
+                return it.isSuccess()
+            }
+            return false
         } catch (e: Exception) {
             Log.e(TAG, "login: $e")
             return false
@@ -78,10 +88,13 @@ object UserService {
 
     fun getUserInfo(userId: String): UserProfile? {
         try {
-            val response = userNao.getUserProfile(TokenMgr.getToken(), userId)
-            if (response.isSuccess()) {
-                response.data?.let {
-                    return UserProfileConverter.fromuUserInfoResponse(it)
+            val call = userNao.getUserProfile(TokenMgr.getToken(), userId)
+            val response = call.execute()
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    if (it.isSuccess() && it.data != null) {
+                        return UserProfileConverter.fromuUserInfoResponse(it.data)
+                    }
                 }
             }
             return null
