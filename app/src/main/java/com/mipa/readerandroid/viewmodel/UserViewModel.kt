@@ -4,11 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.mipa.readerandroid.model.feature.UserProfile
 
-class UserViewModel:ViewModel() {
-    var userProfileState by mutableStateOf(UserProfile())
-        private set
-
-
+object UserViewModel:ViewModel() {
+    var userId by mutableStateOf("")
+    var userName by mutableStateOf("")
+    var email by mutableStateOf("")
+    var role by mutableStateOf("")
+    var createdAt by mutableStateOf("")
 }

@@ -60,7 +60,7 @@ object UserService {
                     if (it.isSuccess()) {
                         it.data?.let { data ->
                             TokenMgr.setToken(data.token)
-                            return UserProfileConverter.fromUserLoginResponse(data.data)
+                            return UserProfileConverter.fromUserLoginResponse(data.userInfo)
                         }
                     }
                 }
@@ -81,7 +81,7 @@ object UserService {
             }
             return false
         } catch (e: Exception) {
-            Log.e(TAG, "login: $e")
+            Log.e(TAG, "register: $e")
             return false
         }
     }
@@ -99,7 +99,7 @@ object UserService {
             }
             return null
         } catch (e: Exception) {
-            Log.e(TAG, "login: $e")
+            Log.e(TAG, "getUserInfo: $e")
             return null
         }
     }

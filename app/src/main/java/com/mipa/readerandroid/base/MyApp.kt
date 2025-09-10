@@ -3,6 +3,7 @@ package com.mipa.readerandroid.base
 import android.app.Application
 import android.content.Context
 import androidx.room.Room.databaseBuilder
+import com.facebook.stetho.Stetho
 import com.mipa.readerandroid.repository.AppDatabase
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ThreadPoolExecutor
@@ -18,6 +19,7 @@ class MyApp : Application() {
             .fallbackToDestructiveMigration()
             .build()
         instance = this
+        Stetho.initializeWithDefaults(this)
     }
 
     fun getDatabase(): AppDatabase? {

@@ -1,6 +1,7 @@
 package com.mipa.readerandroid.view.compose
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,18 +19,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
 fun PersonalProfileScreen() {
+    val userProfile  = MePageCD.userProfile.value
+    val naviConttoller = LocalNavController.current
     Row(
         modifier = Modifier
             .height(120.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth().clickable { MePageCD.onClickUserProfile(naviConttoller) },
         verticalAlignment = Alignment.Top
     ) {
         // 左侧圆形头像
@@ -52,7 +57,7 @@ fun PersonalProfileScreen() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "张三",
+                text = userProfile.userName?:"",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -61,7 +66,7 @@ fun PersonalProfileScreen() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Android 开发工程师",
+                text = userProfile.role?:"",
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
             )
@@ -69,7 +74,7 @@ fun PersonalProfileScreen() {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "zhang.san@example.com",
+                text = userProfile.email?:"",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
             )
@@ -77,7 +82,7 @@ fun PersonalProfileScreen() {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "+86 138 **** 5678",
+                text = userProfile.userId?:"",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
             )

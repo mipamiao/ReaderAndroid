@@ -15,7 +15,7 @@ import retrofit2.http.Query
 interface UserNao {
 
     @POST("${Domain.authPublic}/login")
-    fun login(@Body userLoginRequest: UserLoginRequest): Call<ApiResponse<Token<UserLoginResponse>>>
+    fun login(@Body userLoginRequest: UserLoginRequest): Call<ApiResponse<UserLoginResponse>>
 
     @POST("${Domain.authPublic}/register")
     fun register(@Body userRegisterRequest: UserRegisterRequest): Call<ApiResponse<Boolean>>

@@ -1,6 +1,7 @@
 package com.mipa.readerandroid.service.converter
 
 import com.mipa.readerandroid.model.UserEntity
+import com.mipa.readerandroid.model.dto.UserInfoDto
 import com.mipa.readerandroid.model.dto.UserInfoResponse
 import com.mipa.readerandroid.model.dto.UserLoginResponse
 import com.mipa.readerandroid.model.feature.UserProfile
@@ -17,13 +18,13 @@ class UserProfileConverter {
             }
         }
 
-        fun fromUserLoginResponse(userLoginResponse: UserLoginResponse): UserProfile {
+        fun fromUserLoginResponse(userInfoDto: UserInfoDto): UserProfile {
             return   UserProfile().apply {
-                userId = userLoginResponse.userId
-                userName = userLoginResponse.userName
-                email = userLoginResponse.email
-                createdAt = userLoginResponse.createdAt
-                role = userLoginResponse.role
+                userId = userInfoDto.userId
+                userName = userInfoDto.userName
+                email = userInfoDto.email
+                createdAt = userInfoDto.createdAt
+                role = userInfoDto.role
             }
         }
 

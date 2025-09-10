@@ -5,8 +5,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.mipa.readerandroid.base.AbsActivity
 import com.mipa.readerandroid.ui.theme.ReaderAndroidTheme
-import com.mipa.readerandroid.view.compose.AuthNavigation
+import com.mipa.readerandroid.view.compose.RegistrationScreen
 import com.mipa.readerandroid.view.composedata.LoginPageCD
+import com.mipa.readerandroid.view.composedata.MePageCD
 import com.mipa.readerandroid.view.composedata.RegisterPageCD
 
 class RegisterAndLoginActivity:AbsActivity() {
@@ -17,8 +18,10 @@ class RegisterAndLoginActivity:AbsActivity() {
         enableEdgeToEdge()
         setContent {
             ReaderAndroidTheme {
-                AuthNavigation(loginPageCD, registerPageCD)
+                RegistrationScreen()
             }
         }
+        MePageCD.registerAndLoginActivity = this
+
     }
 }

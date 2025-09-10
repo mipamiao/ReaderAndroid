@@ -1,5 +1,6 @@
 package com.mipa.readerandroid.repository
 
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.mipa.readerandroid.repository.nao.UserNao
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,6 +19,7 @@ object AppNet {
     // 创建 OkHttpClient
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+        .addNetworkInterceptor(StethoInterceptor())
         .connectTimeout(30, TimeUnit.SECONDS) // 连接超时
         .readTimeout(30, TimeUnit.SECONDS)    // 读取超时
         .writeTimeout(30, TimeUnit.SECONDS)   // 写入超时

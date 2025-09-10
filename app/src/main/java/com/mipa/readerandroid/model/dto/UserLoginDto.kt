@@ -5,6 +5,11 @@ data class UserLoginRequest(
     val password: String)
 
 data class UserLoginResponse(
+    val token: String,
+    val userInfo: UserInfoDto
+)
+
+data class UserInfoDto(
     val userId: String,
     val userName: String,
     val email: String,
