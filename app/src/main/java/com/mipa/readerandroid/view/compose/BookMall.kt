@@ -6,8 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,20 +33,20 @@ import com.mipa.readerandroid.view.composedata.BookStoreViewModel
 @Preview(showBackground = true)
 @Composable
 fun BookStoreScreen() {
-    val viewModel: BookStoreViewModel = BookStoreViewModel()
+    val viewModel: BookStoreViewModel = BookStoreViewModel
     // 将直接访问.value替换为collectAsState()
     val books by viewModel.books.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
 
-    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
 
     // 检测是否滑动到底部
     val isAtBottom = remember {
         derivedStateOf {
-            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val totalItemsCount = gridState.layoutInfo.totalItemsCount
             lastVisibleItemIndex != null && lastVisibleItemIndex == totalItemsCount - 1
         }
     }
@@ -73,9 +74,10 @@ fun BookStoreScreen() {
                 )
             }
 
-            // 书籍列表
-            LazyColumn(
-                state = listState,
+            // 书籍列表 - 双列布局
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                state = gridState,
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(books.size) { index ->

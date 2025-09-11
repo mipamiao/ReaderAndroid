@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class BookStoreViewModel : ViewModel() {
+object BookStoreViewModel : ViewModel() {
     private val _books = MutableStateFlow<List<Book>>(emptyList())
     val books: StateFlow<List<Book>> = _books
 
@@ -65,7 +65,8 @@ class BookStoreViewModel : ViewModel() {
                 title = "热门小说标题 $it",
                 author = "作者${(it % 10) + 1}",
                 description = "这是一本非常精彩的小说，讲述了一个扣人心弦的故事，读者评价很高。",
-                price = (10 + (it % 50)).toDouble()
+                price = (10 + (it % 50)).toDouble(),
+                rating = (10 + (it % 50)).toFloat()
             )
         }
     }
