@@ -20,86 +20,90 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
+import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.Chapter
+import com.mipa.readerandroid.view.compose.base.LoadingCompose
+import com.mipa.readerandroid.view.composedata.BookDetailCD
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 
+@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookDetailScreen(book: Book, chapters: List<Chapter>, onBackClick: () -> Unit, onChapterClick: (Chapter) -> Unit) {
+fun BookDetailScreen( ) {
     var isDescriptionExpanded by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("书籍详情") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* 分享功能 */ }) {
-                        Icon(Icons.Default.Share, contentDescription = "分享")
-                    }
-                    IconButton(onClick = { /* 收藏功能 */ }) {
-                        Icon(Icons.Default.Favorite, contentDescription = "收藏")
-                    }
-                }
-            )
+    val book = BookDetailCD.book.value
+    val isLoading by BookDetailCD.isLoading.collectAsState()
+    val chapters: List<Chapter> = getTestChapterList()
+
+    val naviController = LocalNavController.current
+
+    DisposableEffect(Unit) {
+        BookDetailCD.loadBook()
+        onDispose {
+            BookDetailCD.cancelLoad()
         }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // 书籍信息区域
-            item {
-                BookInfoSection(book, isDescriptionExpanded) { isDescriptionExpanded = !isDescriptionExpanded }
-            }
+    }
 
-            // 操作按钮区域
-            item {
-                ActionButtonsSection()
-            }
-
-            // 章节列表标题
-            item {
-                ChapterListHeader(chapters.size)
-            }
-
-            // 章节列表
-            items(chapters) { chapter ->
-                ChapterItem(chapter, onChapterClick)
-            }
-
-            // 底部空间
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
-        }
-
-        // 底部悬浮按钮
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            Button(
-                onClick = { /* 开始阅读 */ },
+    Box(modifier = Modifier
+        .fillMaxSize()){
+        if (isLoading) {
+            LoadingCompose()
+        } else {
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .height(50.dp),
-                shape = RoundedCornerShape(25.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    .fillMaxSize()
             ) {
-                Text("开始阅读", fontSize = 18.sp)
+                // 书籍信息区域
+                item {
+                    BookInfoSection(book, isDescriptionExpanded) { isDescriptionExpanded = !isDescriptionExpanded }
+                }
+
+                // 操作按钮区域
+                item {
+                    ActionButtonsSection()
+                }
+
+                // 章节列表标题
+                item {
+                    ChapterListHeader(chapters.size)
+                }
+
+                // 章节列表
+                items(chapters) { chapter ->
+                    ChapterItem(chapter, { /* 点击章节事件 */ })
+                }
+
+                // 底部空间
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
+            }
+
+            // 底部悬浮按钮
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Button(
+                    onClick = { /* 开始阅读 */ },
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(25.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("开始阅读", fontSize = 18.sp)
+                }
             }
         }
     }
@@ -135,7 +139,7 @@ fun BookInfoSection(book: Book, isDescriptionExpanded: Boolean, onDescriptionCli
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = book.title,
+                    text = book.title?:"",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -144,7 +148,7 @@ fun BookInfoSection(book: Book, isDescriptionExpanded: Boolean, onDescriptionCli
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "作者：${book.author}",
+                    text = "作者：${book.authorName}",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -152,7 +156,7 @@ fun BookInfoSection(book: Book, isDescriptionExpanded: Boolean, onDescriptionCli
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    RatingBar(rating = book.rating)
+                    RatingBar(rating = book.rating?: 0f)
                     Text(
                         text = "${book.rating}",
                         fontSize = 14.sp,
@@ -163,7 +167,7 @@ fun BookInfoSection(book: Book, isDescriptionExpanded: Boolean, onDescriptionCli
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                PriceTag(book.price)
+                PriceTag(book.price?:0f)
             }
         }
 
@@ -187,7 +191,7 @@ fun BookInfoSection(book: Book, isDescriptionExpanded: Boolean, onDescriptionCli
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = book.description,
+                    text = book.description?:"",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = if (isDescriptionExpanded) Int.MAX_VALUE else 3,
@@ -226,7 +230,7 @@ fun RatingBar(rating: Float, maxRating: Int = 5) {
 }
 
 @Composable
-fun PriceTag(price: Double) {
+fun PriceTag(price: Float) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
@@ -390,13 +394,13 @@ fun ChapterItem(chapter: Chapter, onChapterClick: (Chapter) -> Unit) {
 @Composable
 fun BookDetailScreenPreview() {
     val sampleBook = Book(
-        id = 1,
-        title = "三体",
-        author = "刘慈欣",
-        coverUrl = "",
-        description = "文化大革命如火如荼进行的同时，军方探寻外星文明的绝秘计划\"红岸工程\"取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……\n\n四光年外，\"三体文明\"正苦苦挣扎——三颗无规则运行的太阳主导下的百余次毁灭与重生逼迫他们逃离母星。而恰在此时，他们接收到了地球发来的信息。在运用超技术锁死地球人的基础科学之后，三体人庞大的宇宙舰队开始向地球进发……\n\n人类的末日悄然来临。",
-        price = 39.8,
-        rating = 4.9f
+//        bookId = 1,
+//        title = "三体",
+//        authorName = "刘慈欣",
+//        coverImage = "",
+//        description = "文化大革命如火如荼进行的同时，军方探寻外星文明的绝秘计划\"红岸工程\"取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……\n\n四光年外，\"三体文明\"正苦苦挣扎——三颗无规则运行的太阳主导下的百余次毁灭与重生逼迫他们逃离母星。而恰在此时，他们接收到了地球发来的信息。在运用超技术锁死地球人的基础科学之后，三体人庞大的宇宙舰队开始向地球进发……\n\n人类的末日悄然来临。",
+//        price = 39.8,
+//        rating = 4.9f
     )
 
     val sampleChapters = listOf(
@@ -410,12 +414,24 @@ fun BookDetailScreenPreview() {
         Chapter(id = "8", title = "第八章 聚会", wordCount = 3600, isVip = true, isLocked = true)
     )
 
-    MaterialTheme {
-        BookDetailScreen(
-            book = sampleBook,
-            chapters = sampleChapters,
-            onBackClick = {},
-            onChapterClick = {}
-        )
-    }
+//    MaterialTheme {
+//        BookDetailScreen(
+//            book = sampleBook,
+//            chapters = sampleChapters,
+//            onBackClick = {},
+//            onChapterClick = {}
+//        )
+//    }
+}
+fun getTestChapterList (): List<Chapter> {
+    return listOf(
+        Chapter(id = "1", title = "第一章 疯狂年代", wordCount = 3200),
+        Chapter(id = "2", title = "第二章 射手和农场主", wordCount = 2800),
+        Chapter(id = "3", title = "第三章 红岸之一", wordCount = 3500),
+        Chapter(id = "4", title = "第四章 红岸之二", wordCount = 3100),
+        Chapter(id = "5", title = "第五章 叶文洁", wordCount = 4200, isVip = true),
+        Chapter(id = "6", title = "第六章 宇宙闪烁之一", wordCount = 3800, isVip = true, isLocked = true),
+        Chapter(id = "7", title = "第七章 宇宙闪烁之二", wordCount = 4100, isVip = true, isLocked = true),
+        Chapter(id = "8", title = "第八章 聚会", wordCount = 3600, isVip = true, isLocked = true)
+    )
 }

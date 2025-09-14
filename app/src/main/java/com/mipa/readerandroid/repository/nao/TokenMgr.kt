@@ -13,8 +13,13 @@ object TokenMgr {
         return token
     }
 
+    fun getTokenWithPrefix(): String{
+        return "Bearer $token"
+    }
+
     fun setToken(newValue: String) {
         if (token.equals(newValue)) return
+        token = newValue
         SharePreferenceMgr.setValue("jwtToken", newValue)
     }
 

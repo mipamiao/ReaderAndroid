@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ReaderAndroid</string>
+    <string name="book_info_op_success">操作成功</string>
+    <string name="book_info_op_failed">操作失败</string>
 </resources>

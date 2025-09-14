@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,7 +103,7 @@ fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
             ) {
                 // 书名
                 Text(
-                    text = book.title,
+                    text = book.title?:"",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     maxLines = 1,
@@ -113,7 +112,7 @@ fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
 
                 // 作者
                 Text(
-                    text = book.author,
+                    text = book.authorName?:"",
                     fontSize = 14.sp,
                     color = Color.Gray,
                     maxLines = 1,
@@ -123,7 +122,7 @@ fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
 
                 // 简介 - 限制字数
                 Text(
-                    text = book.description,
+                    text = book.description?:"",
                     fontSize = 12.sp,
                     color = Color.DarkGray,
                     maxLines = 2,

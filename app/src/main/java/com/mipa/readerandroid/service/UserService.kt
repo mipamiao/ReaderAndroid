@@ -88,7 +88,7 @@ object UserService {
 
     fun getUserInfo(userId: String): UserProfile? {
         try {
-            val call = userNao.getUserProfile(TokenMgr.getToken(), userId)
+            val call = userNao.getUserProfile(TokenMgr.getTokenWithPrefix(), userId)
             val response = call.execute()
             if (response.isSuccessful) {
                 response.body()?.let {

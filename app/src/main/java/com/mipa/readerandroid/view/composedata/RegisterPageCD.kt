@@ -19,6 +19,8 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.Optional
 
+//todo 导航栈堆积问题
+
 class RegisterPageCD : ViewModel() {
     var name by mutableStateOf("")
     var email by mutableStateOf("")
@@ -28,6 +30,7 @@ class RegisterPageCD : ViewModel() {
     fun register(naviController: NavHostController) {
 
         Observable.fromCallable {
+            ConstValue.delay()
             val res = UserService.register(
                 UserRegisterRequest(
                     userName = name,
@@ -61,6 +64,7 @@ class LoginPageCD : ViewModel() {
     fun login(naviController: NavHostController) {
 
         Observable.fromCallable {
+            ConstValue.delay()
             val res = UserService.login(UserLoginRequest(userName = name, password = password))
             Optional.ofNullable(res)
         }

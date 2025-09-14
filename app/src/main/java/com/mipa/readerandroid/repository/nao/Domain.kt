@@ -8,5 +8,8 @@ class Domain {
 
         const val authPublic = "${publicPrefix}/auth"
         const val authPrivate = "${privatePrefix}/auth"
+
+        const val bookPublic = "${publicPrefix}/book"
+        const val bookPivate = "${privatePrefix}/book"
     }
 }

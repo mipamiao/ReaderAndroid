@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,67 +28,79 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.model.feature.UserProfile
+import com.mipa.readerandroid.view.compose.base.IconAndTextItem
 import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
 fun PersonalProfileScreen() {
     val userProfile  = MePageCD.userProfile.value
     val naviConttoller = LocalNavController.current
-    Row(
-        modifier = Modifier
-            .height(120.dp)
-            .fillMaxWidth().clickable { MePageCD.onClickUserProfile(naviConttoller) },
-        verticalAlignment = Alignment.Top
-    ) {
-        // 左侧圆形头像
-        Box(
+    Column {
+        Row(
             modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
+                .height(120.dp)
+                .fillMaxWidth()
+                .clickable { MePageCD.onClickUserProfile(naviConttoller) },
+            verticalAlignment = Alignment.Top
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.profile_avatar), // 确保在res/drawable目录下有此图片
-                contentDescription = "个人头像",
-                modifier = Modifier.fillMaxSize()
-            )
+            // 左侧圆形头像
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.profile_avatar),
+                    contentDescription = "个人头像",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Spacer(modifier = Modifier.width(24.dp))
+
+            // 右侧个人信息文本
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = userProfile.userName?:"",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = userProfile.role?:"",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = userProfile.email?:"",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = userProfile.userId?:"",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.width(24.dp))
-
-        // 右侧个人信息文本
-        Column(
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = userProfile.userName?:"",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = userProfile.role?:"",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = userProfile.email?:"",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = userProfile.userId?:"",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-            )
+        Column {
+            if(MePageCD.isLogin())
+                IconAndTextItem(Icons.AutoMirrored.Filled.MenuBook, "我的书籍", onClick = {
+                    MePageCD.onClickMyBooksItem(naviConttoller)
+                })
         }
     }
+
 }

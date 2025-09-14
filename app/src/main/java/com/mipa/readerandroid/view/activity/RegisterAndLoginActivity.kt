@@ -21,7 +21,6 @@ class RegisterAndLoginActivity:AbsActivity() {
                 RegistrationScreen()
             }
         }
-        MePageCD.registerAndLoginActivity = this
 
     }
 }

@@ -24,14 +24,17 @@ object MePageCD : ViewModel() {
         _userProfile.value = userProfile
     }
 
-    var mainActivity: MainActivity? = null
-    var registerAndLoginActivity: RegisterAndLoginActivity? = null
-
     fun onClickUserProfile(naviController: NavHostController){
         if(!isLogin()){
             naviController.navigate(ConstValue.ROUTER_LOGIN)
         }else {
             naviController.navigate(ConstValue.ROUTER_ME_DETAIL)
+        }
+    }
+
+    fun onClickMyBooksItem(naviController: NavHostController){
+        naviController.navigate(ConstValue.ROUTER_MY_BOOKS){
+            launchSingleTop = true
         }
     }
 

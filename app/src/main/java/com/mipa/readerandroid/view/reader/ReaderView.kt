@@ -26,67 +26,67 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun showText(text: String) {
-    val density = LocalDensity.current
-    val widthPx = with(density){width.dp.toPx()}
-    val heightPx = with(density){height.dp.toPx()}
-
-    var constraints by remember { mutableStateOf<Constraints?>(null) }
-
-    LocalContext.current.resources.displayMetrics.let { displayMetrics ->
-        constraints = Constraints(
-            maxWidth = displayMetrics
-                .widthPixels
-                .minus(
-                    with(LocalDensity.current) {
-                        (paddingValues.calculateStartPadding(LayoutDirection.Ltr) + paddingValues.calculateEndPadding(
-                            LayoutDirection.Ltr
-                        ))
-                            .toPx()
-                    }.toInt()
-                ),
-            maxHeight = displayMetrics
-                .heightPixels
-                .minus(
-                    with(LocalDensity.current) {
-                        (paddingValues.calculateTopPadding() + paddingValues.calculateBottomPadding() + 10.dp)
-                            .toPx()
-                    }.toInt()
-                ),
-        )
-    }
-
-    val textMeasurer = rememberTextMeasurer()
-    val fontSize = 16.sp
-    val textLayoutResult = textMeasurer.measure(
-        text = AnnotatedString(text),
-        style = TextStyle(fontSize = fontSize),
-        constraints = Constraints(maxWidth = widthPx.toInt())
-    )
-    val texts = sliceText(text, textLayoutResult, heightPx.toInt())
-    val index by remember { mutableStateOf(0) }
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = {texts.size})
-
-    HorizontalPager(
-        state = pagerState
-    ) { page ->
-        // page 是当前要绘制的页号
-        Box(modifier = Modifier.clickable {
-            CoroutineScope(Dispatchers.Main).launch {
-                pagerState.animateScrollToPage(
-                    pagerState.currentPage + 1
-                )
-            }
-        }) {
-            cons
-            Text(texts.get(page))
-        }
-
-    }
-
-}
+//@OptIn(ExperimentalFoundationApi::class)
+//@Composable
+//fun showText(text: String) {
+//    val density = LocalDensity.current
+//    val widthPx = with(density){width.dp.toPx()}
+//    val heightPx = with(density){height.dp.toPx()}
+//
+//    var constraints by remember { mutableStateOf<Constraints?>(null) }
+//
+//    LocalContext.current.resources.displayMetrics.let { displayMetrics ->
+//        constraints = Constraints(
+//            maxWidth = displayMetrics
+//                .widthPixels
+//                .minus(
+//                    with(LocalDensity.current) {
+//                        (paddingValues.calculateStartPadding(LayoutDirection.Ltr) + paddingValues.calculateEndPadding(
+//                            LayoutDirection.Ltr
+//                        ))
+//                            .toPx()
+//                    }.toInt()
+//                ),
+//            maxHeight = displayMetrics
+//                .heightPixels
+//                .minus(
+//                    with(LocalDensity.current) {
+//                        (paddingValues.calculateTopPadding() + paddingValues.calculateBottomPadding() + 10.dp)
+//                            .toPx()
+//                    }.toInt()
+//                ),
+//        )
+//    }
+//
+//    val textMeasurer = rememberTextMeasurer()
+//    val fontSize = 16.sp
+//    val textLayoutResult = textMeasurer.measure(
+//        text = AnnotatedString(text),
+//        style = TextStyle(fontSize = fontSize),
+//        constraints = Constraints(maxWidth = widthPx.toInt())
+//    )
+//    val texts = sliceText(text, textLayoutResult, heightPx.toInt())
+//    val index by remember { mutableStateOf(0) }
+//    val pagerState = rememberPagerState(initialPage = 0, pageCount = {texts.size})
+//
+//    HorizontalPager(
+//        state = pagerState
+//    ) { page ->
+//        // page 是当前要绘制的页号
+//        Box(modifier = Modifier.clickable {
+//            CoroutineScope(Dispatchers.Main).launch {
+//                pagerState.animateScrollToPage(
+//                    pagerState.currentPage + 1
+//                )
+//            }
+//        }) {
+//            cons
+//            Text(texts.get(page))
+//        }
+//
+//    }
+//
+//}
 
 fun sliceText(text: String, textLayoutResult: TextLayoutResult, maxHeight: Int): List<String> {
     val lineHeight = textLayoutResult.getLineBottom(0) - textLayoutResult.getLineTop(0)
