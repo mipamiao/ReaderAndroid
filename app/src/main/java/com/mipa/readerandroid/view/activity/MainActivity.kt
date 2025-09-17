@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import com.mipa.model.UserProfileViewModel
 import com.mipa.readerandroid.base.AbsActivity
 import com.mipa.readerandroid.ui.theme.ReaderAndroidTheme
@@ -33,6 +34,7 @@ import com.mipa.readerandroid.view.composedata.MePageCD
 
 class MainActivity :AbsActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

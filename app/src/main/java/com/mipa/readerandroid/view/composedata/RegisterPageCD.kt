@@ -30,7 +30,7 @@ class RegisterPageCD : ViewModel() {
     fun register(naviController: NavHostController) {
 
         Observable.fromCallable {
-            ConstValue.delay()
+            //ConstValue.delay()
             val res = UserService.register(
                 UserRegisterRequest(
                     userName = name,
@@ -64,7 +64,7 @@ class LoginPageCD : ViewModel() {
     fun login(naviController: NavHostController) {
 
         Observable.fromCallable {
-            ConstValue.delay()
+            //ConstValue.delay()
             val res = UserService.login(UserLoginRequest(userName = name, password = password))
             Optional.ofNullable(res)
         }

@@ -1,5 +1,6 @@
 package com.mipa.readerandroid.view.composedata
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -33,6 +34,7 @@ class BookInfoEditCD(val book: Book): ViewModel() {
         description.value = book.description ?: ""
         category.value = book.category ?: ""
         book.tags?.let { tags.addAll(it) }
+        updateCount()
     }
 
     fun onSave(quit: () -> Unit = {}){
@@ -73,4 +75,11 @@ class BookInfoEditCD(val book: Book): ViewModel() {
         book.tags = tags
     }
 
+    companion object{
+        var count = 0
+        fun updateCount(){
+            count ++
+            Log.e("TAG", "updateCount: $count", )
+        }
+    }
 }

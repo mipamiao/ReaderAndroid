@@ -11,5 +11,8 @@ class Domain {
 
         const val bookPublic = "${publicPrefix}/book"
         const val bookPivate = "${privatePrefix}/book"
+
+        const val chapterPublic = "${publicPrefix}/chapter"
+        const val chapterPrivate = "${privatePrefix}/chapter"
     }
 }

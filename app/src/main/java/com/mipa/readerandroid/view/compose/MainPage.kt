@@ -43,7 +43,8 @@ import androidx.navigation.compose.rememberNavController
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.base.BottomBarSchdule
 import com.mipa.readerandroid.view.compose.base.TopBarSchdule
-
+import com.mipa.readerandroid.view.compose.writer.WriterView
+import com.mipa.readerandroid.view.reader.ReaderScreen
 
 
 val LocalNavController = staticCompositionLocalOf<NavHostController> {
@@ -87,6 +88,10 @@ fun MainNavigation() {
                 composable(ConstValue.ROUTER_ME_DETAIL) { MeDetailPage() }
                 composable(ConstValue.ROUTER_BOOK_DETAIL) { BookDetailScreen() }
                 composable(ConstValue.ROUTER_MY_BOOKS){MyBooksScreen()}
+                composable(ConstValue.ROUTER_CHAPTER_LIST){ ChapterListScreen() }
+                composable(ConstValue.ROUTER_MY_CHAPTERS_LIST){ MyChaptersPageScreen() }
+                composable(ConstValue.ROUTER_READER_PAGE){ ReaderScreen() }
+                composable(ConstValue.ROUTER_WRITER_PAGE){ WriterView() }
             }
         }
     }

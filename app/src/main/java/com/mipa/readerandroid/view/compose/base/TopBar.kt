@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.LocalNavController
+import com.mipa.readerandroid.view.composedata.ChapterListPageCD
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,10 +94,32 @@ fun BookDetailPageTopBar() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChapterListPageTopBar() {
+    val naviController = LocalNavController.current
+    var viewModel = ChapterListPageCD
+    TopAppBar(
+        title = { Text(viewModel.book.value.title ?: "default") },
+        navigationIcon = {
+            IconButton(onClick = { viewModel.onBackClick(naviController) }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+            }
+        }
+    )
+}
+
 @Composable
 fun TopBarSchdule(Router: String){
-    when(Router){
-        ConstValue.ROUTER_BOOK_DETAIL ->{BookDetailPageTopBar()}
+    when (Router) {
+        ConstValue.ROUTER_BOOK_DETAIL -> {
+            BookDetailPageTopBar()
+        }
+
+        ConstValue.ROUTER_CHAPTER_LIST -> {
+            ChapterListPageTopBar()
+        }
+
         else -> {}
     }
 }
