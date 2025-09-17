@@ -1,7 +1,9 @@
 package com.mipa.readerandroid.repository
 
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.repository.nao.BookNao
+import com.mipa.readerandroid.repository.nao.ChapterNao
 import com.mipa.readerandroid.repository.nao.UserNao
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object AppNet {
-    private const val BASE_URL = "http://192.168.202.27:8080"
+    private const val BASE_URL = "http://192.168.1.9:8080"
 
     // 创建日志拦截器
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -34,13 +36,16 @@ object AppNet {
         .build()
 
 
-
-    fun userNao(): UserNao{
+    fun userNao(): UserNao {
         return retrofit.create(UserNao::class.java)
     }
 
-    fun bookNao(): BookNao{
+    fun bookNao(): BookNao {
         return retrofit.create(BookNao::class.java)
+    }
+
+    fun chapterNao(): ChapterNao {
+        return retrofit.create(ChapterNao::class.java)
     }
 
 }

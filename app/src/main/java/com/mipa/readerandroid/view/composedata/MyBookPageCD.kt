@@ -23,7 +23,8 @@ object MyBookPageCD: BooksShowViewModel(){
     }
 
     override fun onBookClick(book: Book, naviController: NavHostController) {
-
+        MyChaptersPageCD.setBook(book)
+        naviController.navigate(ConstValue.ROUTER_MY_CHAPTERS_LIST)
     }
 
     fun onBookEditClick(book: Book, naviController: NavHostController){
@@ -45,11 +46,7 @@ object MyBookPageCD: BooksShowViewModel(){
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {result->
-                    val context = MyApp.getInstance().getContext()
-                    val message =
-                        if ( result) context.getString( R.string.book_info_op_success)
-                        else context.getString( R.string.book_info_op_failed)
-                    Toast.makeText(context, message , Toast.LENGTH_SHORT).show()
+                    ConstValue.showOPstate(result)
                     if(result)MyBookPageCD.books.remove(book)
                 },
                 { error ->

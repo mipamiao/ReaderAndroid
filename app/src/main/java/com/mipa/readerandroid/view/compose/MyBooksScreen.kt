@@ -124,6 +124,9 @@ fun MyBooksScreen() {
                     items(myBooks.size, key = {myBooks[it].bookId!!}) {
                         MyBookItem(
                             book = myBooks[it],
+                            onBookClick={book->
+                                MyBookPageCD.onBookClick(book, naviController)
+                            },
                             onEditClick = { book ->
                                 viewModel.onBookEditClick(book, naviController)
                                 },
@@ -162,6 +165,7 @@ fun MyBooksScreen() {
 @Composable
 fun MyBookItem(
     book: Book,
+    onBookClick:(Book) -> Unit,
     onEditClick: (Book) -> Unit,
     onRemoveClick: (Book) -> Unit,
     modifier: Modifier = Modifier
@@ -170,6 +174,7 @@ fun MyBookItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable { onBookClick(book) }
     ) {
         Row(modifier = Modifier.padding(12.dp)) {
             // 书籍封面

@@ -28,11 +28,14 @@ import androidx.navigation.compose.rememberNavController
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.Chapter
+import com.mipa.readerandroid.view.compose.base.IconAndTextItem
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.BookDetailCD
+import com.mipa.readerandroid.view.composedata.ChapterListPageCD
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 
+//todo bugfix：展开简介后目录消失
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,11 +44,15 @@ fun BookDetailScreen( ) {
 
     val book = BookDetailCD.book.value
     val isLoading by BookDetailCD.isLoading.collectAsState()
-    val chapters: List<Chapter> = getTestChapterList()
+
 
     val naviController = LocalNavController.current
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(book) {
+        ChapterListPageCD.setBook(book)
+    }
+
+    DisposableEffect(book) {
         BookDetailCD.loadBook()
         onDispose {
             BookDetailCD.cancelLoad()
@@ -57,35 +64,24 @@ fun BookDetailScreen( ) {
         if (isLoading) {
             LoadingCompose()
         } else {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                // 书籍信息区域
-                item {
-                    BookInfoSection(book, isDescriptionExpanded) { isDescriptionExpanded = !isDescriptionExpanded }
-                }
-
-                // 操作按钮区域
-                item {
-                    ActionButtonsSection()
-                }
-
-                // 章节列表标题
-                item {
-                    ChapterListHeader(chapters.size)
-                }
-
-                // 章节列表
-                items(chapters) { chapter ->
-                    ChapterItem(chapter, { /* 点击章节事件 */ })
-                }
-
-                // 底部空间
-                item {
-                    Spacer(modifier = Modifier.height(80.dp))
-                }
+                BookInfoSection(book, isDescriptionExpanded) { isDescriptionExpanded = !isDescriptionExpanded }
+                ActionButtonsSection()
+                IconAndTextItem(Icons.Default.ChairAlt, " 目录", onClick = {
+                    ChapterListPageCD.setBook(book)
+                    naviController.navigate(ConstValue.ROUTER_CHAPTER_LIST){
+                        launchSingleTop = true
+                    }
+                })
+                ChapterListScreen()
+                Spacer(modifier = Modifier.height(80.dp))
             }
+
+
+
 
             // 底部悬浮按钮
             Box(
@@ -285,153 +281,5 @@ fun ActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, text: St
     }
 }
 
-@Composable
-fun ChapterListHeader(chapterCount: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "目录 ($chapterCount)",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Default.SwapVert,
-                contentDescription = "排序",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                text = "倒序",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-        }
-    }
 
-    Divider(modifier = Modifier.padding(horizontal = 16.dp))
-}
-
-@Composable
-fun ChapterItem(chapter: Chapter, onChapterClick: (Chapter) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onChapterClick(chapter) }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (chapter.isVip) {
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(width = 24.dp, height = 16.dp)
-                        .background(
-                            color = Color(0xFFFF6D00),
-                            shape = RoundedCornerShape(2.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "VIP",
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Text(
-                text = chapter.title,
-                fontSize = 16.sp,
-                color = if (chapter.isLocked) Color.Gray else MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-                //modifier = Modifier.weight(1f)
-            )
-        }
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "${chapter.wordCount}字",
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
-
-            if (chapter.isLocked) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "锁定",
-                    tint = Color.Gray,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .size(16.dp)
-                )
-            }
-        }
-    }
-
-    Divider(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth(),
-        thickness = 0.5.dp,
-        color = Color.LightGray
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BookDetailScreenPreview() {
-    val sampleBook = Book(
-//        bookId = 1,
-//        title = "三体",
-//        authorName = "刘慈欣",
-//        coverImage = "",
-//        description = "文化大革命如火如荼进行的同时，军方探寻外星文明的绝秘计划\"红岸工程\"取得了突破性进展。但在按下发射键的那一刻，历经劫难的叶文洁没有意识到，她彻底改变了人类的命运。地球文明向宇宙发出的第一声啼鸣，以太阳为中心，以光速向宇宙深处飞驰……\n\n四光年外，\"三体文明\"正苦苦挣扎——三颗无规则运行的太阳主导下的百余次毁灭与重生逼迫他们逃离母星。而恰在此时，他们接收到了地球发来的信息。在运用超技术锁死地球人的基础科学之后，三体人庞大的宇宙舰队开始向地球进发……\n\n人类的末日悄然来临。",
-//        price = 39.8,
-//        rating = 4.9f
-    )
-
-    val sampleChapters = listOf(
-        Chapter(id = "1", title = "第一章 疯狂年代", wordCount = 3200),
-        Chapter(id = "2", title = "第二章 射手和农场主", wordCount = 2800),
-        Chapter(id = "3", title = "第三章 红岸之一", wordCount = 3500),
-        Chapter(id = "4", title = "第四章 红岸之二", wordCount = 3100),
-        Chapter(id = "5", title = "第五章 叶文洁", wordCount = 4200, isVip = true),
-        Chapter(id = "6", title = "第六章 宇宙闪烁之一", wordCount = 3800, isVip = true, isLocked = true),
-        Chapter(id = "7", title = "第七章 宇宙闪烁之二", wordCount = 4100, isVip = true, isLocked = true),
-        Chapter(id = "8", title = "第八章 聚会", wordCount = 3600, isVip = true, isLocked = true)
-    )
-
-//    MaterialTheme {
-//        BookDetailScreen(
-//            book = sampleBook,
-//            chapters = sampleChapters,
-//            onBackClick = {},
-//            onChapterClick = {}
-//        )
-//    }
-}
-fun getTestChapterList (): List<Chapter> {
-    return listOf(
-        Chapter(id = "1", title = "第一章 疯狂年代", wordCount = 3200),
-        Chapter(id = "2", title = "第二章 射手和农场主", wordCount = 2800),
-        Chapter(id = "3", title = "第三章 红岸之一", wordCount = 3500),
-        Chapter(id = "4", title = "第四章 红岸之二", wordCount = 3100),
-        Chapter(id = "5", title = "第五章 叶文洁", wordCount = 4200, isVip = true),
-        Chapter(id = "6", title = "第六章 宇宙闪烁之一", wordCount = 3800, isVip = true, isLocked = true),
-        Chapter(id = "7", title = "第七章 宇宙闪烁之二", wordCount = 4100, isVip = true, isLocked = true),
-        Chapter(id = "8", title = "第八章 聚会", wordCount = 3600, isVip = true, isLocked = true)
-    )
-}
