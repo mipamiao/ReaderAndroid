@@ -78,6 +78,8 @@ fun SearchScreen() {
 
     val naviController = LocalNavController.current
 
+    var inInput by remember { mutableStateOf(false) }
+
 
     // 搜索框状态
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -147,13 +149,19 @@ fun SearchScreen() {
                     // 搜索输入框
                     TextField(
                         value = searchText,
-                        onValueChange = { searchText = it },
+                        onValueChange = {
+                            searchText = it
+                            inInput = true
+                        },
                         placeholder = { Text("搜索书籍、作者或标签") },
                         modifier = Modifier
                             .weight(1f)
                             .background(Color.Transparent),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { handleSearch() }),
+                        keyboardActions = KeyboardActions(onSearch = {
+                            handleSearch()
+                            inInput = false
+                        }),
                         singleLine = true,
                         colors = TextFieldDefaults.textFieldColors(
                             focusedIndicatorColor = Color.Transparent,
@@ -195,7 +203,7 @@ fun SearchScreen() {
                     SearchOptionButton(text = "标签") { handleSearch() }
                 }
             }
-
+            if(inInput) return@Column
             // 搜索结果区域
             if (searchText.text.isNotEmpty()) {
                 if (searchResults.isEmpty()&&!isLoading) {
