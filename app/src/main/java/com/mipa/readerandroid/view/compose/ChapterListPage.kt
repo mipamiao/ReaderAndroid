@@ -32,7 +32,7 @@ fun ChapterListScreen() {
     val isLoading by viewModel.isLoading.collectAsState()
     val currentBook by viewModel.book.collectAsState()
 
-    var naviControllrt = LocalNavController.current
+    var naviController = LocalNavController.current
 
     // 加载章节数据
     LaunchedEffect(currentBook) {
@@ -71,11 +71,7 @@ fun ChapterListScreen() {
                         ChapterItem(
                             chapter = chapter,
                             onChapterClick = {
-                                ReaderViewCD.bookId = currentBook.bookId
-                                ReaderViewCD.chapterId = chapter.chapterId
-                                naviControllrt.navigate(ConstValue.ROUTER_READER_PAGE) {
-                                    launchSingleTop = true
-                                }
+                                ChapterListPageCD.onChapterClick(chapter, naviController)
                             }
                         )
                         Divider(modifier = Modifier.padding(vertical = 4.dp))

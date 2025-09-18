@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.service.BookService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -33,7 +34,7 @@ object BookDetailCD :ViewModel() {
     fun loadBook(){
         disposable = Observable.fromCallable {
             _isLoading.value = true
-            Thread.sleep(2000)
+            ConstValue.delay()
             Optional.ofNullable(BookService.getBook(_bookId.value))
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

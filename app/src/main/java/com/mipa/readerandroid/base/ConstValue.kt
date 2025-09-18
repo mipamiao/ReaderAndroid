@@ -19,9 +19,10 @@ class ConstValue {
         const val ROUTER_MY_CHAPTERS_LIST = "mychapterslist"
         const val ROUTER_READER_PAGE = "raderpage"
         const val ROUTER_WRITER_PAGE = "writerpage"
+        const val ROUTER_BOOK_SHELF = "bookshelf"
 
 
-        public fun delay(mill: Long = 2000) {
+        fun delay(mill: Long = 2000) {
             Thread.sleep(mill)
         }
 

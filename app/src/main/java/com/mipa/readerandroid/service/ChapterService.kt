@@ -39,7 +39,7 @@ object ChapterService {
                 return it
             }
         }
-        return emptyList<ChapterInfo>()
+        return emptyList()
     }
 
     suspend fun addChapter(chapterDto: ChapterDto): ChapterInfo?{

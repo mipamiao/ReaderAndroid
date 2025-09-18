@@ -52,7 +52,7 @@ fun BookDetailScreen( ) {
         ChapterListPageCD.setBook(book)
     }
 
-    DisposableEffect(book) {
+    DisposableEffect(Unit) {
         BookDetailCD.loadBook()
         onDispose {
             BookDetailCD.cancelLoad()
