@@ -92,6 +92,7 @@ fun MainNavigation() {
                 composable(ConstValue.ROUTER_MY_CHAPTERS_LIST){ MyChaptersPageScreen() }
                 composable(ConstValue.ROUTER_READER_PAGE){ ReaderScreen() }
                 composable(ConstValue.ROUTER_WRITER_PAGE){ WriterView() }
+                composable(ConstValue.ROUTER_BOOK_SHELF){ BookshelfScreen() }
             }
         }
     }

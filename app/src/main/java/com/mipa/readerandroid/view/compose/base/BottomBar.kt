@@ -1,6 +1,7 @@
 package com.mipa.readerandroid.view.compose.base
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.LocalNavController
+import com.mipa.readerandroid.view.composedata.BookShelfPageCD
 
 @Composable
 fun MainPageBottomBar(){
@@ -28,6 +30,17 @@ fun MainPageBottomBar(){
             }
         )
         NavigationBarItem(
+            icon = { Icon(Icons.Filled.Bed, contentDescription = "书架") },
+            label = { Text("书架") },
+            selected = currentRoute.equals(ConstValue.ROUTER_BOOK_SHELF),
+            onClick = {
+                BookShelfPageCD.needFlush()
+                naviController.navigate(ConstValue.ROUTER_BOOK_SHELF){
+                    launchSingleTop = true
+                }
+            }
+        )
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "个人中心") },
             label = { Text("个人中心") },
             selected = currentRoute.equals(ConstValue.ROUTER_MEPAGE),
@@ -41,9 +54,14 @@ fun MainPageBottomBar(){
 }
 
 @Composable
-fun BottomBarSchdule(Router: String){
-    when(Router){
-        ConstValue.ROUTER_BOOKMALL,ConstValue.ROUTER_MEPAGE ->{MainPageBottomBar()}
+fun BottomBarSchdule(Router: String) {
+    when (Router) {
+        ConstValue.ROUTER_BOOKMALL,
+        ConstValue.ROUTER_MEPAGE,
+        ConstValue.ROUTER_BOOK_SHELF -> {
+            MainPageBottomBar()
+        }
+
         else -> {}
     }
 }

@@ -4,6 +4,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.repository.nao.BookNao
 import com.mipa.readerandroid.repository.nao.ChapterNao
+import com.mipa.readerandroid.repository.nao.LibraryNao
 import com.mipa.readerandroid.repository.nao.UserNao
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,4 +49,7 @@ object AppNet {
         return retrofit.create(ChapterNao::class.java)
     }
 
+    fun libraryNao(): LibraryNao {
+        return retrofit.create(LibraryNao::class.java)
+    }
 }
