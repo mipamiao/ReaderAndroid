@@ -26,7 +26,7 @@ object MePageCD : ViewModel() {
 
     fun onClickUserProfile(naviController: NavHostController){
         if(!isLogin()){
-            naviController.navigate(ConstValue.ROUTER_LOGIN)
+            naviController.navigate(ConstValue.ROUTER_AUTH_PAGE)
         }else {
             naviController.navigate(ConstValue.ROUTER_ME_DETAIL)
         }
@@ -40,6 +40,9 @@ object MePageCD : ViewModel() {
 
     fun quitLogin(naviController: NavHostController){
         updateUserProfile(UserProfile())
-        naviController.navigate(ConstValue.ROUTER_MEPAGE)
+        naviController.navigate(ConstValue.ROUTER_MEPAGE){
+            launchSingleTop = true
+            popUpTo(0)
+        }
     }
 }

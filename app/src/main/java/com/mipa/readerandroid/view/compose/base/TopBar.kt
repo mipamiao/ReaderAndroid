@@ -48,7 +48,9 @@ fun BookDetailPageTopBar() {
             .height(64.dp),
         navigationIcon = {
             IconButton(
-                onClick = { naviController.navigate(ConstValue.ROUTER_BOOKMALL) },
+                onClick = { naviController.navigate(ConstValue.ROUTER_BOOKMALL){
+                    popUpTo(0)
+                } },
                 modifier = Modifier
                     .padding(0.dp)
                     .fillMaxHeight() // 填满高度

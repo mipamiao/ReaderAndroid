@@ -79,12 +79,13 @@ fun MainNavigation() {
             NavHost(
                 navController = navController,
                 startDestination = ConstValue.ROUTER_BOOKMALL,
-                modifier = Modifier.padding(paddingValues)
+                modifier = Modifier.padding(paddingValues),
+                enterTransition = { fadeIn() },
+                exitTransition = { fadeOut() },
             ) {
                 composable(ConstValue.ROUTER_BOOKMALL) { BookStoreScreen() }
                 composable(ConstValue.ROUTER_MEPAGE) { PersonalProfileScreen() }
-                composable(ConstValue.ROUTER_REGISTER) { RegistrationScreen() }
-                composable(ConstValue.ROUTER_LOGIN) { LoginScreen() }
+                composable(ConstValue.ROUTER_AUTH_PAGE){ AuthScreen() }
                 composable(ConstValue.ROUTER_ME_DETAIL) { MeDetailPage() }
                 composable(ConstValue.ROUTER_BOOK_DETAIL) { BookDetailScreen() }
                 composable(ConstValue.ROUTER_MY_BOOKS){MyBooksScreen()}

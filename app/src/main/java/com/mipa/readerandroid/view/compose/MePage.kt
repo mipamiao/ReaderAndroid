@@ -36,7 +36,7 @@ import com.mipa.readerandroid.view.composedata.MePageCD
 fun PersonalProfileScreen() {
     val userProfile  = MePageCD.userProfile.value
     val naviConttoller = LocalNavController.current
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
                 .height(120.dp)
