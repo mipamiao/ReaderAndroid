@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -41,6 +42,17 @@ fun MainPageBottomBar(){
             }
         )
         NavigationBarItem(
+            icon = { Icon(Icons.Filled.Search, contentDescription = "搜索") },
+            label = { Text("搜索") },
+            selected = currentRoute.equals(ConstValue.ROUTER_SEARCH_PAGE),
+            onClick = {
+                BookShelfPageCD.needFlush()
+                naviController.navigate(ConstValue.ROUTER_SEARCH_PAGE){
+                    launchSingleTop = true
+                }
+            }
+        )
+        NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "个人中心") },
             label = { Text("个人中心") },
             selected = currentRoute.equals(ConstValue.ROUTER_MEPAGE),
@@ -58,7 +70,8 @@ fun BottomBarSchdule(Router: String) {
     when (Router) {
         ConstValue.ROUTER_BOOKMALL,
         ConstValue.ROUTER_MEPAGE,
-        ConstValue.ROUTER_BOOK_SHELF -> {
+        ConstValue.ROUTER_BOOK_SHELF,
+        ConstValue.ROUTER_SEARCH_PAGE-> {
             MainPageBottomBar()
         }
 

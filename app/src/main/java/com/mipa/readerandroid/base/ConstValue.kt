@@ -20,6 +20,7 @@ class ConstValue {
         const val ROUTER_READER_PAGE = "raderpage"
         const val ROUTER_WRITER_PAGE = "writerpage"
         const val ROUTER_BOOK_SHELF = "bookshelf"
+        const val ROUTER_SEARCH_PAGE = "searchpage"
 
 
         fun delay(mill: Long = 2000) {
