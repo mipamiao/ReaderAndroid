@@ -27,6 +27,7 @@ fun MainPageBottomBar(){
             onClick = {
                 naviController.navigate(ConstValue.ROUTER_BOOKMALL){
                     launchSingleTop = true
+                    popUpTo(0)
                 }
             }
         )
@@ -38,6 +39,7 @@ fun MainPageBottomBar(){
                 BookShelfPageCD.needFlush()
                 naviController.navigate(ConstValue.ROUTER_BOOK_SHELF){
                     launchSingleTop = true
+                    popUpTo(0)
                 }
             }
         )
@@ -49,6 +51,7 @@ fun MainPageBottomBar(){
                 BookShelfPageCD.needFlush()
                 naviController.navigate(ConstValue.ROUTER_SEARCH_PAGE){
                     launchSingleTop = true
+                    popUpTo(0)
                 }
             }
         )
@@ -59,6 +62,7 @@ fun MainPageBottomBar(){
             onClick = {
                 naviController.navigate(ConstValue.ROUTER_MEPAGE){
                     launchSingleTop = true
+                    popUpTo(0)
                 }
             }
         )

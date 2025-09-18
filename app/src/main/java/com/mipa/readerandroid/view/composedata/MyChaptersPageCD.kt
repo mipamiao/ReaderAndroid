@@ -45,7 +45,7 @@ object MyChaptersPageCD: ChaptersShowViewModel(){
 
     fun onAddClick(naviController: NavHostController) {
         WriterViewCD.bookId = book.value.bookId
-        WriterViewCD.order = chapters.size
+        WriterViewCD.order = chapters.size + 1
         naviController.navigate(ConstValue.ROUTER_WRITER_PAGE) {
             launchSingleTop = true
         }
