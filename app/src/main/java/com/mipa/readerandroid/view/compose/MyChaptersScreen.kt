@@ -27,6 +27,8 @@ import com.mipa.readerandroid.R
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.model.feature.ChapterInfo
 import com.mipa.readerandroid.view.composedata.MyChaptersPageCD
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 
 //todo 从writerView返回没必要重新请求章节列表
 @OptIn(ExperimentalMaterial3Api::class)

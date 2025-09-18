@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.R
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
