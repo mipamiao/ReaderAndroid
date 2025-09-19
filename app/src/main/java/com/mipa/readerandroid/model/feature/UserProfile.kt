@@ -8,4 +8,5 @@ class UserProfile {
      var email: String? = null
      var role: String? = null // reader / author
      var createdAt: String? = null
+     var avatarUrl: String? = null
 }
