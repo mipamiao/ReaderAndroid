@@ -12,6 +12,7 @@ class UserEntityConverter {
                 email = userProfile.email
                 createdAt = userProfile.createdAt
                 role = userProfile.role
+                avatarUrl = userProfile.avatarUrl
             }
         }
     }

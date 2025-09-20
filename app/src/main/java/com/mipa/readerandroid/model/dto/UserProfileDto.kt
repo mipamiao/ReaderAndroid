@@ -7,5 +7,6 @@ data class UserInfoResponse(
     var userName: String,
     var email: String,
     var role: String,
-    var createdAt: String
+    var createdAt: String,
+    val avatarUrl: String
 )

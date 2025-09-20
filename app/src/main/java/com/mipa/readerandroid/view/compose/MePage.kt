@@ -59,11 +59,11 @@ fun PersonalProfileScreen() {
             ) {
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(viewModel.avatarUrl.value)
+                        .data(avatarUrl.value)
                         .placeholder(R.drawable.default_avatar)
                         .error(R.drawable.default_avatar)
                         .crossfade(true)
-                        .build()
+                        .build(),
                 )
                 Image(
                     painter = painter,

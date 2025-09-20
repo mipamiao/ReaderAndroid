@@ -15,6 +15,7 @@ class UserProfileConverter {
                 email = userEntity.email
                 createdAt = userEntity.createdAt
                 role = userEntity.role
+                avatarUrl = userEntity.avatarUrl
             }
         }
 
@@ -25,6 +26,7 @@ class UserProfileConverter {
                 email = userInfoDto.email
                 createdAt = userInfoDto.createdAt
                 role = userInfoDto.role
+                avatarUrl = userInfoDto.avatarUrl
             }
         }
 
@@ -35,6 +37,7 @@ class UserProfileConverter {
                 email = userInfoResponse.email
                 createdAt = userInfoResponse.createdAt
                 role = userInfoResponse.role
+                avatarUrl = userInfoResponse.avatarUrl
             }
         }
     }

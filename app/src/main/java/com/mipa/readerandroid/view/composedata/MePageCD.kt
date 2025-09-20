@@ -35,7 +35,7 @@ object MePageCD : ViewModel() {
 
     fun updateUserProfile(userProfile: UserProfile){
         _userProfile.value = userProfile
-        avatarUrl.value = userProfile.avatarUrl
+       avatarUrl.value = userProfile.avatarUrl
     }
 
     fun onClickUserProfile(naviController: NavHostController){
@@ -66,7 +66,8 @@ object MePageCD : ViewModel() {
                 UserService.uploadAvatar(uri)
             }
             ConstValue.showOPstate(url != null)
-            avatarUrl.value = AppNet.BASE_URL + url
+            avatarUrl.value = url
         }
     }
+
 }

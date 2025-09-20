@@ -1,8 +1,12 @@
 package com.mipa.readerandroid.view.compose
 
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,20 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.BookInfoEditCD
-import kotlinx.coroutines.launch
 
 //todo 对于进行耗时操作或有error的compose，是否可以分为加载界面，错误界面，正常界面，以及上或下的bar这4部分
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -39,7 +41,7 @@ fun BookEditScreen(
     onCancel: () -> Unit
 ) {
 
-    val viewmodel = BookInfoEditCD(book)
+    val viewModel = BookInfoEditCD(book)
 
 
 
@@ -52,9 +54,18 @@ fun BookEditScreen(
     // 保存按钮启用状态
     val isSaveEnabled = remember {
         derivedStateOf {
-            viewmodel.title.value.isNotEmpty() &&
-                    viewmodel.description.value.isNotEmpty()
+            viewModel.title.value.isNotEmpty() &&
+                    viewModel.description.value.isNotEmpty()
         }
+    }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+        uri?.let { viewModel.updateCoverImg(it, onCancel) }
     }
 
     Scaffold(
@@ -69,7 +80,7 @@ fun BookEditScreen(
                 actions = {
                     TextButton(
                         onClick = {
-                            viewmodel.onSave(onCancel)
+                            viewModel.onSave(onCancel)
                         },
                         enabled = isSaveEnabled.value
                     ) {
@@ -87,7 +98,7 @@ fun BookEditScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (viewmodel.isSaving.value) {
+            if (viewModel.isSaving.value) {
                 LoadingCompose()
             } else {
                 Column(
@@ -103,15 +114,24 @@ fun BookEditScreen(
                     ) {
                         // 封面图片
                         Box(
-                            modifier = Modifier
+                            modifier = Modifier.clickable {
+                                launcher.launch("image/*")
+                            }
                                 .size(120.dp, 180.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                         ) {
-                            if (viewmodel.coverImage.value != null) {
+                            if (viewModel.coverImage.value != null) {
+                                val painter = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(viewModel.coverImage.value)
+                                        .placeholder(R.drawable.default_avatar)
+                                        .error(R.drawable.default_avatar)
+                                        .crossfade(true)
+                                        .build())
                                 // 实际项目中可以使用Coil等库加载网络图片
                                 Image(
-                                    painter = painterResource(id = R.drawable.profile_avatar), // 占位图
+                                    painter = painter, // 占位图
                                     contentDescription = "书籍封面",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize()
@@ -124,7 +144,7 @@ fun BookEditScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Icon(
-                                        Icons.Default.Book,
+                                        Icons.Default.Add,
                                         contentDescription = "无封面",
                                         modifier = Modifier.size(48.dp),
                                         tint = MaterialTheme.colorScheme.secondary
@@ -145,8 +165,8 @@ fun BookEditScreen(
                         ) {
                             // 书名
                             OutlinedTextField(
-                                value = viewmodel.title.value,
-                                onValueChange = { viewmodel.title.value = it },
+                                value = viewModel.title.value,
+                                onValueChange = { viewModel.title.value = it },
                                 label = { Text("书名") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
@@ -158,8 +178,8 @@ fun BookEditScreen(
 
                             // 类别
                             OutlinedTextField(
-                                value = viewmodel.category.value,
-                                onValueChange = { viewmodel.category.value = it },
+                                value = viewModel.category.value,
+                                onValueChange = { viewModel.category.value = it },
                                 label = { Text("类别") },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true,
@@ -180,8 +200,8 @@ fun BookEditScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         OutlinedTextField(
-                            value = viewmodel.description.value,
-                            onValueChange = { viewmodel.description.value = it },
+                            value = viewModel.description.value,
+                            onValueChange = { viewModel.description.value = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp),
@@ -218,8 +238,8 @@ fun BookEditScreen(
                             Button(
                                 onClick = {
                                     val tagText = newTagState.value.text.trim()
-                                    if (tagText.isNotEmpty()&&!viewmodel.tags.contains(tagText)) {
-                                        viewmodel.tags.add(tagText)
+                                    if (tagText.isNotEmpty()&&!viewModel.tags.contains(tagText)) {
+                                        viewModel.tags.add(tagText)
                                         newTagState.value = TextFieldValue("")
                                     }
                                 },
@@ -230,19 +250,19 @@ fun BookEditScreen(
                         }
 
                         // 标签列表
-                        if (viewmodel.tags.isNotEmpty()) {
+                        if (viewModel.tags.isNotEmpty()) {
                             FlowRow(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 12.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                viewmodel.tags.forEachIndexed { index, tag ->
+                                viewModel.tags.forEachIndexed { index, tag ->
                                     AssistChip(
                                         label = { Text(tag) },
                                         trailingIcon = {
                                             IconButton(
-                                                onClick = { viewmodel.tags.removeAt(index) },
+                                                onClick = { viewModel.tags.removeAt(index) },
                                                 modifier = Modifier.size(16.dp)
                                             ) {
                                                 Icon(Icons.Default.Close, contentDescription = "移除标签", Modifier.size(14.dp))

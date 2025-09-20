@@ -30,7 +30,7 @@ interface UserNao {
     ): Call<ApiResponse<UserInfoResponse>>
 
     @Multipart
-    @POST("${Domain.authPrivate}/add-avatar")
+    @POST("${Domain.authPrivate}/update-avatar")
     suspend fun uploadAvatar(
         @Header("Authorization") token: String,
         @Part avatar: MultipartBody.Part
