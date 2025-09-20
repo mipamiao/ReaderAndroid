@@ -22,11 +22,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.model.feature.UserProfile
 import com.mipa.readerandroid.view.compose.base.IconAndTextItem
@@ -34,7 +37,11 @@ import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
 fun PersonalProfileScreen() {
-    val userProfile  = MePageCD.userProfile.value
+
+    val viewModel = MePageCD
+    val userProfile  = viewModel.userProfile.value
+    val avatarUrl = viewModel.avatarUrl
+
     val naviConttoller = LocalNavController.current
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -50,8 +57,16 @@ fun PersonalProfileScreen() {
                     .size(120.dp)
                     .clip(CircleShape)
             ) {
+                val painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(avatarUrl.value)
+                        .placeholder(R.drawable.default_avatar)
+                        .error(R.drawable.default_avatar)
+                        .crossfade(true)
+                        .build(),
+                )
                 Image(
-                    painter = painterResource(id = R.drawable.profile_avatar),
+                    painter = painter,
                     contentDescription = "个人头像",
                     modifier = Modifier.fillMaxSize()
                 )

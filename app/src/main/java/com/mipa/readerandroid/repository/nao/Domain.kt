@@ -20,5 +20,7 @@ class Domain {
 
         const val searchPublic = "${publicPrefix}/search"
         const val searchPrivate = "${privatePrefix}/search"
+
+
     }
 }

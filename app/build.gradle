@@ -88,6 +88,8 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.2' // 提供Android主线程调度器
     implementation 'io.reactivex.rxjava3:rxkotlin:3.0.1' // 可选，提供 Kotlin 扩展
 
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit

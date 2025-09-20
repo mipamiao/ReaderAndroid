@@ -1,8 +1,12 @@
 package com.mipa.readerandroid.view.compose
 
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -18,13 +22,32 @@ import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.R
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
 fun MeDetailPage(
 ) {
+    val viewModel = MePageCD
     val userProfile = MePageCD.userProfile.value
     val naviController = LocalNavController.current
+
+    val avatarUrl = viewModel.avatarUrl
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+        uri?.let { viewModel.uploadAvatar(it) }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -52,21 +75,19 @@ fun MeDetailPage(
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primaryContainer)
                     ) {
-                        if (userProfile.userName?.isNotEmpty() == true) {
-                            Text(
-                                text = userProfile.userName!!.take(1),
-                                fontSize = 48.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile_avatar),
-                                contentDescription = "默认头像",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
+                        val painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(viewModel.avatarUrl.value)
+                                .placeholder(R.drawable.default_avatar)
+                                .error(R.drawable.default_avatar)
+                                .crossfade(true)
+                                .build()
+                        )
+                        Image(
+                            painter = painter,
+                            contentDescription = "默认头像",
+                            modifier = Modifier.fillMaxSize().clickable { launcher.launch("image/*") }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

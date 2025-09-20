@@ -15,14 +15,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.model.feature.Book
 
+//todo 将默认封面改为使用居中的大字，就像默认头像那样
 @Composable
 fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
     Card(
@@ -47,10 +51,15 @@ fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                     .background(Color.LightGray)
             ) {
-                // 实际项目中应该使用网络图片加载库如Coil或Glide
-                // 这里使用占位图
+                val painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(book.coverImage)
+                        .placeholder(R.drawable.default_book_cover)
+                        .error(R.drawable.default_book_cover)
+                        .crossfade(true)
+                        .build())
                 Image(
-                    painter = painterResource(id = R.drawable.profile_avatar),
+                    painter = painter,
                     contentDescription = book.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

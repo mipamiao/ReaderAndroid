@@ -1,10 +1,15 @@
 package com.mipa.readerandroid.service
 
-import com.mipa.readerandroid.model.dto.BookListDto
+import android.net.Uri
+import android.util.Log
+import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.repository.AppNet
+import com.mipa.readerandroid.repository.nao.ApiResponse
 import com.mipa.readerandroid.repository.nao.TokenMgr
-import com.mipa.readerandroid.service.converter.BookDtoConverter
+import com.mipa.readerandroid.repository.util.FileUtils
+import com.mipa.readerandroid.service.UserService.TAG
+import com.mipa.readerandroid.service.UserService.userNao
 
 //todo 还是数据类的问题，到底该怎么合理的使用数据类和实体类，就算这两个相同也要独立定义吗
 object BookService {
@@ -91,6 +96,25 @@ object BookService {
             }
         }
         return false
+    }
+
+    suspend fun updateCoverImg(uri: Uri, bookId: String): String? {
+        val context = MyApp.getInstance().getContext()
+        return try {
+            val requestFile = FileUtils.createPart(context, uri, "coverImg")
+            requestFile?.let {
+                val response: ApiResponse<String> =
+                    bookNao.updateCoverImg(TokenMgr.getTokenWithPrefix(), it, bookId)
+                if (response.isSuccess()) {
+                    response.data
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "updateCoverImg: $e")
+            null
+        }
     }
 
 

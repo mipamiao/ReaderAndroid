@@ -1,21 +1,18 @@
 package com.mipa.readerandroid.service
 
-import android.nfc.Tag
+import android.net.Uri
 import android.util.Log
 import com.mipa.readerandroid.base.MyApp
-import com.mipa.readerandroid.base.SharePreferenceMgr
 import com.mipa.readerandroid.model.dto.UserLoginRequest
-import com.mipa.readerandroid.model.dto.UserLoginResponse
 import com.mipa.readerandroid.model.dto.UserRegisterRequest
 import com.mipa.readerandroid.model.feature.UserProfile
 import com.mipa.readerandroid.repository.AppDatabase
 import com.mipa.readerandroid.repository.AppNet
 import com.mipa.readerandroid.repository.nao.ApiResponse
-import com.mipa.readerandroid.repository.nao.Token
 import com.mipa.readerandroid.repository.nao.TokenMgr
+import com.mipa.readerandroid.repository.util.FileUtils
 import com.mipa.readerandroid.service.converter.UserEntityConverter
 import com.mipa.readerandroid.service.converter.UserProfileConverter
-import retrofit2.Call
 
 //todo 将其改造为mao，dao，nao的层次结构，外部无需分开调用，由service本身决定
 object UserService {
@@ -103,5 +100,25 @@ object UserService {
             return null
         }
     }
+
+    suspend fun uploadAvatar(uri: Uri): String? {
+        val context = MyApp.getInstance().getContext()
+        return try {
+            val requestFile = FileUtils.createPart(context, uri, "avatar")
+            requestFile?.let {
+                val response: ApiResponse<String> =
+                    userNao.uploadAvatar(TokenMgr.getTokenWithPrefix(), it)
+                if (response.isSuccess()) {
+                    response.data
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "uploadAvatar: $e")
+            null
+        }
+    }
+
 
 }

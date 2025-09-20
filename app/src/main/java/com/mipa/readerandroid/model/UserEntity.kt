@@ -27,4 +27,7 @@ class UserEntity {
 
     @ColumnInfo(name = "created_at")
     var createdAt: String? = null
+
+    @ColumnInfo(name = "avatar_url")
+    var avatarUrl: String? = null
 }

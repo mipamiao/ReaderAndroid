@@ -29,9 +29,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.MyBookPageCD
@@ -181,8 +184,15 @@ fun MyBookItem(
             Box(modifier = Modifier.size(80.dp, 120.dp)) {
                 if (book.coverImage != null) {
                     // 实际项目中可以使用Coil等库加载网络图片
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(book.coverImage)
+                            .placeholder(R.drawable.default_avatar)
+                            .error(R.drawable.default_avatar)
+                            .crossfade(true)
+                            .build())
                     Image(
-                        painter = painterResource(id = R.drawable.profile_avatar), // 占位图
+                        painter = painter, // 占位图
                         contentDescription = "${book.title}封面",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()

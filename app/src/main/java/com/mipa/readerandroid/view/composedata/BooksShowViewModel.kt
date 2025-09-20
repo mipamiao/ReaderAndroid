@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
 
+//todo 和DatasShowViewModel整合+使用协程而不是rxjava
 abstract class BooksShowViewModel : ViewModel() {
     val books = mutableStateListOf<Book>()
 
