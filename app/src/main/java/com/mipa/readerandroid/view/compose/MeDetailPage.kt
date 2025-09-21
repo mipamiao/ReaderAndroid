@@ -29,13 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.view.composedata.MePageCD
 
 @Composable
 fun MeDetailPage(
 ) {
-    val viewModel = MePageCD
-    val userProfile = MePageCD.userProfile.value
+    val viewModel = CDMap.get<MePageCD>()
+    val userProfile = viewModel.userProfile.value
     val naviController = LocalNavController.current
 
     val avatarUrl = viewModel.avatarUrl
@@ -148,7 +149,7 @@ fun MeDetailPage(
 
             // 底部退出按钮
             Button(
-                onClick = { MePageCD.quitLogin(naviController) },
+                onClick = { viewModel.quitLogin(naviController) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)

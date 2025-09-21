@@ -39,6 +39,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.graphics.Color
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.view.composedata.AuthPageCD
 
 
@@ -272,7 +273,7 @@ fun AuthTopBar(
 fun AuthScreen() {
 
     val naviController = LocalNavController.current
-    val viewModel = remember { AuthPageCD()}
+    val viewModel = CDMap.get<AuthPageCD>()
     // 状态管理
     var isLoginScreen  = viewModel.isLoginScreen
 

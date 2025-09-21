@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.BaseCD
 
 //todo 和DatasShowViewModel整合+使用协程而不是rxjava
-abstract class BooksShowViewModel : ViewModel() {
+abstract class BooksShowViewModel : BaseCD() {
     val books = mutableStateListOf<Book>()
 
     private val _isLoading = MutableStateFlow(false)

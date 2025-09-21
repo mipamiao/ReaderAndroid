@@ -36,12 +36,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mipa.readerandroid.base.CDMap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WriterView() {
     // 状态管理
-    val viewModel = WriterViewCD
+    val viewModel = CDMap.get<WriterViewCD>()
     val title = viewModel.title
     val content  = viewModel.content
 
@@ -77,7 +78,7 @@ fun WriterView() {
                     )
                 )
                 Button(
-                    onClick = { WriterViewCD.onSave() },
+                    onClick = { viewModel.onSave() },
                     modifier = Modifier
                         .background(
                             color = Color.White,

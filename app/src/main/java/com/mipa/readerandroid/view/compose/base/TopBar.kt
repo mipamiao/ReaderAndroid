@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.composedata.ChapterListPageCD
@@ -100,7 +101,7 @@ fun BookDetailPageTopBar() {
 @Composable
 fun ChapterListPageTopBar() {
     val naviController = LocalNavController.current
-    var viewModel = ChapterListPageCD
+    var viewModel = CDMap.get<ChapterListPageCD>()
     TopAppBar(
         title = { Text(viewModel.book.value.title ?: "default") },
         navigationIcon = {

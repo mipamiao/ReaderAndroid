@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.BookShelfPageCD
@@ -60,14 +61,14 @@ import com.mipa.readerandroid.view.composedata.MePageCD
 @Composable
 fun BookshelfScreen() {
 
-    val viewModel = BookShelfPageCD
+    val viewModel = CDMap.get<BookShelfPageCD>()
     val librarys = viewModel.datas
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
 
     val naviController = LocalNavController.current
 
-    if(!MePageCD.isLogin()){
+    if(!CDMap.get<MePageCD>().isLogin()){
         Box(modifier = Modifier.fillMaxSize()){
             Text("登录后才能使用书架", modifier = Modifier.align(Alignment.Center), fontSize = 24.sp)
         }

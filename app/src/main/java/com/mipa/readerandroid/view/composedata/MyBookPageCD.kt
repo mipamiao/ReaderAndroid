@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Book
@@ -13,7 +14,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-object MyBookPageCD: BooksShowViewModel(){
+class MyBookPageCD: BooksShowViewModel(){
 
     val showEditDialog =  mutableStateOf(false)
     var currentBook: Book? = null
@@ -23,18 +24,20 @@ object MyBookPageCD: BooksShowViewModel(){
     }
 
     override fun onBookClick(book: Book, naviController: NavHostController) {
-        MyChaptersPageCD.setBook(book)
+        CDMap.get<MyChaptersPageCD>().from(book)
         naviController.navigate(ConstValue.ROUTER_MY_CHAPTERS_LIST)
     }
 
     fun onBookEditClick(book: Book, naviController: NavHostController){
+        currentBook = Book()
         showEditDialog.value = true
-        currentBook = book
+        CDMap.get<BookInfoEditCD>().from(book)
     }
 
     fun onBookAddClick(){
         currentBook = Book()
         showEditDialog.value = true
+        CDMap.get<BookInfoEditCD>().from(currentBook!!)
     }
 
     fun onBookRemoveClick(book: Book){
@@ -47,7 +50,7 @@ object MyBookPageCD: BooksShowViewModel(){
             .subscribe(
                 {result->
                     ConstValue.showOPstate(result)
-                    if(result)MyBookPageCD.books.remove(book)
+                    if(result)books.remove(book)
                 },
                 { error ->
                     error.printStackTrace()

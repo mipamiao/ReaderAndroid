@@ -1,11 +1,12 @@
 package com.mipa.readerandroid.view.composedata
 
 import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.service.SearchService
 
-object SearchPageCD: DatasShowViewModel<Book>() {
+class SearchPageCD: DatasShowViewModel<Book>() {
 
     var keyword: String = ""
     val searchSuggestions = listOf(
@@ -26,7 +27,7 @@ object SearchPageCD: DatasShowViewModel<Book>() {
     }
 
     override fun onBookClick(data: Book, naviController: NavHostController) {
-        data.bookId?.let { BookDetailCD.updateBook(it) }
+        data.bookId?.let { CDMap.get<BookDetailCD>().from(data) }
         naviController.navigate(ConstValue.ROUTER_BOOK_DETAIL){
             launchSingleTop = true
         }

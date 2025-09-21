@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.BaseCD
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Book
@@ -23,7 +25,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BookInfoEditCD(val book: Book): ViewModel() {
+class BookInfoEditCD(): BaseCD() {
+
+    private var book: Book? = null
+
     val coverImage = mutableStateOf("")
     val title = mutableStateOf("")
     val description = mutableStateOf("")
@@ -35,14 +40,6 @@ class BookInfoEditCD(val book: Book): ViewModel() {
     private val _isSaving = mutableStateOf(false)
     val isSaving:State<Boolean> = _isSaving
 
-    init {
-        coverImage.value = book.coverImage ?: ""
-        title.value = book.title ?: ""
-        description.value = book.description ?: ""
-        category.value = book.category ?: ""
-        book.tags?.let { tags.addAll(it) }
-        updateCount()
-    }
 
     fun onSave(quit: () -> Unit = {}){
         if(_isSaving.value)return
@@ -51,16 +48,18 @@ class BookInfoEditCD(val book: Book): ViewModel() {
         reWrite()
         disposable = Observable.fromCallable{
             ConstValue.delay()
-            book.bookId?.let {
-                BookService.updateBook(it, book)
-            } ?: (BookService.addBook(book))
+            book?.let { book ->
+                book.bookId?.let {
+                    BookService.updateBook(it, book)
+                } ?: (BookService.addBook(book))
+            }?:false
         }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {result->
                     val context = MyApp.getInstance().getContext()
                     ConstValue.showOPstate(result)// todo 由服务端决定展示什么toast消息，服务端未下发再由客户端兜底
-                    MyBookPageCD.refresh()
+                    CDMap.get<MyBookPageCD>().refresh()
                     quit()
                     _isSaving.value = false
                 },
@@ -78,14 +77,14 @@ class BookInfoEditCD(val book: Book): ViewModel() {
         viewModelScope.launch {
             val url = withContext(Dispatchers.IO) {
                 ConstValue.delay()
-                book.bookId?.let {
+                book?.bookId?.let {
                     BookService.updateCoverImg(uri, it)
                 }
             }
             ConstValue.showOPstate(url != null)
             url?.let {
                 coverImage.value = it
-                MyBookPageCD.refresh()
+                CDMap.get<MyBookPageCD>().refresh()
                 quit()
             }
             _isSaving.value = false
@@ -93,12 +92,25 @@ class BookInfoEditCD(val book: Book): ViewModel() {
     }
 
     private fun reWrite(){
-        book.coverImage = coverImage.value
-        book.title = title.value
-        book.description = description.value
-        book.category = category.value
-        book.tags = tags
+        book?.let {book->
+            book.coverImage = coverImage.value
+            book.title = title.value
+            book.description = description.value
+            book.category = category.value
+            book.tags = tags
+        }
     }
+
+    fun from(book: Book){
+        coverImage.value = book.coverImage?:""
+        title.value = book.title?:""
+        description.value = book.description?:""
+        category.value = book.category?:""
+        tags.clear()
+        tags.addAll(book.tags?: emptyList())
+        this.book = book
+    }
+
 
     companion object{
         var count = 0

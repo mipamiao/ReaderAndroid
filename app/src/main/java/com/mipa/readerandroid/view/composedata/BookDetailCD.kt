@@ -1,9 +1,10 @@
 package com.mipa.readerandroid.view.composedata
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
+import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.BaseCD
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.service.BookService
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Optional
 
-object BookDetailCD :ViewModel() {
+class BookDetailCD :BaseCD() {
     private val _bookId = mutableStateOf("")
     val bookId: State<String> = _bookId
 
@@ -29,6 +30,10 @@ object BookDetailCD :ViewModel() {
 
     fun updateBook(boolId: String){
         _bookId.value = boolId
+    }
+
+    fun from(book: Book){
+        _book.value = book
     }
 
     fun loadBook(){
@@ -50,6 +55,13 @@ object BookDetailCD :ViewModel() {
     fun cancelLoad(){
         disposable?.dispose()
         disposable = null
+    }
+
+    fun onClickDirItem(naviController: NavHostController) {
+        CDMap.put(ChapterListPageCD()).from(book.value)
+        naviController.navigate(ConstValue.ROUTER_CHAPTER_LIST){
+            launchSingleTop = true
+        }
     }
 
 

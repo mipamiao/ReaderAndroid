@@ -13,11 +13,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.BaseCD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class DatasShowViewModel<T>: ViewModel() {
+abstract class DatasShowViewModel<T>: BaseCD() {
     val datas = mutableStateListOf<T>()
 
     private val _isLoading = MutableStateFlow(false)

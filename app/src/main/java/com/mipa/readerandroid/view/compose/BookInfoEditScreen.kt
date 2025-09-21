@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.BookInfoEditCD
@@ -41,7 +42,7 @@ fun BookEditScreen(
     onCancel: () -> Unit
 ) {
 
-    val viewModel = BookInfoEditCD(book)
+    val viewModel = CDMap.get<BookInfoEditCD>()
 
 
 
@@ -114,9 +115,10 @@ fun BookEditScreen(
                     ) {
                         // 封面图片
                         Box(
-                            modifier = Modifier.clickable {
-                                launcher.launch("image/*")
-                            }
+                            modifier = Modifier
+                                .clickable {
+                                    launcher.launch("image/*")
+                                }
                                 .size(120.dp, 180.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)

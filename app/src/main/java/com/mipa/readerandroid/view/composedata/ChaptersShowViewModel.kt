@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.ChapterInfo
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class ChaptersShowViewModel : ViewModel() {
+abstract class ChaptersShowViewModel : BaseCD() {
 
     val chapters = mutableStateListOf<ChapterInfo>()
 
@@ -57,5 +58,9 @@ abstract class ChaptersShowViewModel : ViewModel() {
 
     fun onBackClick(naviController: NavHostController) {
         naviController.popBackStack()
+    }
+
+    open fun from(book: Book){
+        setBook(book)
     }
 }
