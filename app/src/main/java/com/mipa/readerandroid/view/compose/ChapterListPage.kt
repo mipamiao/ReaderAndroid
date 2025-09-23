@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.base.ChapterItem
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
@@ -27,7 +28,7 @@ import com.mipa.readerandroid.view.reader.ReaderViewCD
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterListScreen() {
-    val viewModel = ChapterListPageCD
+    val viewModel = CDMap.get<ChapterListPageCD>()
     val chapters = viewModel.chapters
     val isLoading by viewModel.isLoading.collectAsState()
     val currentBook by viewModel.book.collectAsState()
@@ -71,7 +72,7 @@ fun ChapterListScreen() {
                         ChapterItem(
                             chapter = chapter,
                             onChapterClick = {
-                                ChapterListPageCD.onChapterClick(chapter, naviController)
+                                viewModel.onChapterClick(chapter, naviController)
                             }
                         )
                         Divider(modifier = Modifier.padding(vertical = 4.dp))

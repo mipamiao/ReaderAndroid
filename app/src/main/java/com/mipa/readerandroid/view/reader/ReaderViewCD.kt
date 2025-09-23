@@ -1,7 +1,7 @@
 package com.mipa.readerandroid.view.reader
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.service.ChapterService
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object ReaderViewCD: ViewModel() {
+class ReaderViewCD: BaseCD() {
 
     var bookId: String? = null
     var chapterId: String? = null
@@ -37,5 +37,10 @@ object ReaderViewCD: ViewModel() {
             }
             _isLoading.value = false
         }
+    }
+
+    fun from(bookId: String?, chapterId: String?){
+        this.bookId = bookId
+        this.chapterId = chapterId
     }
 }

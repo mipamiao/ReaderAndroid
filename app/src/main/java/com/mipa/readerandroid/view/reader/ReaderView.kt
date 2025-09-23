@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import kotlin.math.min
@@ -28,7 +29,7 @@ import kotlin.math.min
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderScreen() {
-    val viewModel = ReaderViewCD
+    val viewModel = CDMap.get<ReaderViewCD>()
     val chapter by viewModel.chapter.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 

@@ -35,13 +35,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.MyBookPageCD
 
 @Composable
 fun MyBooksScreen() {
-    val viewModel: MyBookPageCD = MyBookPageCD
+    val viewModel: MyBookPageCD = CDMap.get<MyBookPageCD>()
     LaunchedEffect(Unit) {
         viewModel.refresh()
     }
@@ -128,7 +129,7 @@ fun MyBooksScreen() {
                         MyBookItem(
                             book = myBooks[it],
                             onBookClick={book->
-                                MyBookPageCD.onBookClick(book, naviController)
+                                viewModel.onBookClick(book, naviController)
                             },
                             onEditClick = { book ->
                                 viewModel.onBookEditClick(book, naviController)

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.combineHost
 import com.mipa.readerandroid.model.feature.Book
 
 //todo 将默认封面改为使用居中的大字，就像默认头像那样
@@ -53,7 +54,7 @@ fun BookItem(book: Book, onBookClick: (Book) -> Unit) {
             ) {
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(book.coverImage)
+                        .data(book.coverImage?.combineHost())
                         .placeholder(R.drawable.default_book_cover)
                         .error(R.drawable.default_book_cover)
                         .crossfade(true)

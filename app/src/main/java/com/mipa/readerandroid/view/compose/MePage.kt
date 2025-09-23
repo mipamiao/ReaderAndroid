@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.model.feature.UserProfile
 import com.mipa.readerandroid.view.compose.base.IconAndTextItem
 import com.mipa.readerandroid.view.composedata.MePageCD
@@ -38,7 +39,7 @@ import com.mipa.readerandroid.view.composedata.MePageCD
 @Composable
 fun PersonalProfileScreen() {
 
-    val viewModel = MePageCD
+    val viewModel = CDMap.get<MePageCD>()
     val userProfile  = viewModel.userProfile.value
     val avatarUrl = viewModel.avatarUrl
 
@@ -48,7 +49,7 @@ fun PersonalProfileScreen() {
             modifier = Modifier
                 .height(120.dp)
                 .fillMaxWidth()
-                .clickable { MePageCD.onClickUserProfile(naviConttoller) },
+                .clickable { viewModel.onClickUserProfile(naviConttoller) },
             verticalAlignment = Alignment.Top
         ) {
             // 左侧圆形头像
@@ -111,9 +112,9 @@ fun PersonalProfileScreen() {
             }
         }
         Column {
-            if(MePageCD.isLogin())
+            if(viewModel.isLogin())
                 IconAndTextItem(Icons.AutoMirrored.Filled.MenuBook, "我的书籍", onClick = {
-                    MePageCD.onClickMyBooksItem(naviConttoller)
+                    viewModel.onClickMyBooksItem(naviConttoller)
                 })
         }
     }

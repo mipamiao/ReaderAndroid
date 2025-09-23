@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.composedata.BookShelfPageCD
@@ -36,7 +37,7 @@ fun MainPageBottomBar(){
             label = { Text("书架") },
             selected = currentRoute.equals(ConstValue.ROUTER_BOOK_SHELF),
             onClick = {
-                BookShelfPageCD.needFlush()
+                CDMap.get<BookShelfPageCD>().needFlush()
                 naviController.navigate(ConstValue.ROUTER_BOOK_SHELF){
                     launchSingleTop = true
                     popUpTo(0)
@@ -48,7 +49,6 @@ fun MainPageBottomBar(){
             label = { Text("搜索") },
             selected = currentRoute.equals(ConstValue.ROUTER_SEARCH_PAGE),
             onClick = {
-                BookShelfPageCD.needFlush()
                 naviController.navigate(ConstValue.ROUTER_SEARCH_PAGE){
                     launchSingleTop = true
                     popUpTo(0)

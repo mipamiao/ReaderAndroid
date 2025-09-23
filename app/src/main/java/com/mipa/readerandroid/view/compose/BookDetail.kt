@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.Chapter
@@ -42,20 +43,22 @@ import kotlinx.coroutines.awaitCancellation
 fun BookDetailScreen( ) {
     var isDescriptionExpanded by remember { mutableStateOf(false) }
 
-    val book = BookDetailCD.book.value
-    val isLoading by BookDetailCD.isLoading.collectAsState()
+    val viewModel = CDMap.get<BookDetailCD>()
+
+    val book = viewModel.book.value
+    val isLoading by viewModel.isLoading.collectAsState()
 
 
     val naviController = LocalNavController.current
 
     LaunchedEffect(book) {
-        ChapterListPageCD.setBook(book)
+        CDMap.get<ChapterListPageCD>().setBook(book)
     }
 
     DisposableEffect(Unit) {
-        BookDetailCD.loadBook()
+        viewModel.loadBook()
         onDispose {
-            BookDetailCD.cancelLoad()
+            viewModel.cancelLoad()
         }
     }
 
@@ -71,10 +74,7 @@ fun BookDetailScreen( ) {
                 BookInfoSection(book, isDescriptionExpanded) { isDescriptionExpanded = !isDescriptionExpanded }
                 ActionButtonsSection()
                 IconAndTextItem(Icons.Default.ChairAlt, " 目录", onClick = {
-                    ChapterListPageCD.setBook(book)
-                    naviController.navigate(ConstValue.ROUTER_CHAPTER_LIST){
-                        launchSingleTop = true
-                    }
+                    viewModel.onClickDirItem(naviController)
                 })
                 ChapterListScreen()
                 Spacer(modifier = Modifier.height(80.dp))

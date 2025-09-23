@@ -29,12 +29,13 @@ import com.mipa.readerandroid.model.feature.ChapterInfo
 import com.mipa.readerandroid.view.composedata.MyChaptersPageCD
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import com.mipa.readerandroid.base.CDMap
 
 //todo 从writerView返回没必要重新请求章节列表
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyChaptersPageScreen() {
-    val viewModel = MyChaptersPageCD
+    val viewModel = CDMap.get<MyChaptersPageCD>()
     val chapters = viewModel.chapters
     val isLoading by viewModel.isLoading.collectAsState()
     val currentBook by viewModel.book.collectAsState()
@@ -63,7 +64,7 @@ fun MyChaptersPageScreen() {
                 },
                 actions = {
                     // 添加章节按钮
-                    IconButton(onClick = { MyChaptersPageCD.onAddClick(naviController) }) {
+                    IconButton(onClick = { viewModel.onAddClick(naviController) }) {
                         Icon(Icons.Default.Add, contentDescription = "添加章节")
                     }
                 }
@@ -101,7 +102,7 @@ fun MyChaptersPageScreen() {
                     Text(text = "暂无章节，点击右上角添加", modifier = Modifier.padding(top = 16.dp))
                     // 快捷添加按钮
                     Button(
-                        onClick = { MyChaptersPageCD.onAddClick(naviController) },
+                        onClick = { viewModel.onAddClick(naviController) },
                         modifier = Modifier.padding(top = 16.dp)
                     ) {
                         Text("立即添加第一章")
@@ -113,12 +114,12 @@ fun MyChaptersPageScreen() {
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(chapters,key = {it.chapterId!!}) {
+                    items(chapters,key = {it.chapterId!!}) { chapterInfo ->
                         AuthorChapterItem(
-                            chapterinfo = it,
-                            onChapterClick = { MyChaptersPageCD.onEditClick(it, naviController) },
-                            onEditClick = { MyChaptersPageCD.onEditClick(it, naviController) },
-                            onDeleteClick = { MyChaptersPageCD.onDeleteClick(it) }
+                            chapterinfo = chapterInfo,
+                            onChapterClick = { viewModel.onEditClick(chapterInfo, naviController) },
+                            onEditClick = { viewModel.onEditClick(chapterInfo, naviController) },
+                            onDeleteClick = { viewModel.onDeleteClick(chapterInfo) }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }

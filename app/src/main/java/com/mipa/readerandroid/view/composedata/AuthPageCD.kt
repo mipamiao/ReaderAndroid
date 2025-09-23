@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.mipa.readerandroid.base.BaseCD
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.dto.UserLoginRequest
 import com.mipa.readerandroid.model.dto.UserRegisterRequest
@@ -17,7 +19,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.Optional
 
-class AuthPageCD: ViewModel() {
+class AuthPageCD: BaseCD() {
 
     var isLoginScreen = mutableStateOf(true)
 
@@ -71,7 +73,7 @@ class AuthPageCD: ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { res ->
                 res.ifPresent {
-                    MePageCD.updateUserProfile(res.get())
+                    CDMap.get<MePageCD>().updateUserProfile(res.get())
                     naviController.navigate(ConstValue.ROUTER_MEPAGE) {
                         launchSingleTop = true
                         popUpTo(0)
@@ -83,5 +85,6 @@ class AuthPageCD: ViewModel() {
     fun switchToRegister(){
         isLoginScreen.value = false
     }
+
 
 }

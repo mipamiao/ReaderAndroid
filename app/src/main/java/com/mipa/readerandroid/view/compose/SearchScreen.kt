@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.SearchPageCD
@@ -69,7 +70,7 @@ import com.mipa.readerandroid.view.composedata.SearchPageCD
 @Composable
 fun SearchScreen() {
 
-    val viewModel = SearchPageCD
+    val viewModel = CDMap.get<SearchPageCD>()
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
     val searchResults = viewModel.datas
