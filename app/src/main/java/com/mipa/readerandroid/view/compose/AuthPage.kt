@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.graphics.Color
 import com.mipa.readerandroid.base.CDMap
+import com.mipa.readerandroid.view.compose.dialog.LoadingDialog
 import com.mipa.readerandroid.view.composedata.AuthPageCD
 
 
@@ -254,16 +255,6 @@ fun AuthTopBar(
                         }
                 )
             }
-
-//            // 指示器下划线
-//            Spacer(
-//                modifier = Modifier
-//                    .offset(x = indicatorOffset)
-//                    .width(indicatorWidth)
-//                    .height(3.dp)
-//                    .background(MaterialTheme.colorScheme.primary)
-//                    .align(Alignment.BottomCenter)
-//            )
         }
     }
 }
@@ -284,6 +275,7 @@ fun AuthScreen() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            LoadingDialog(viewModel.dialogController)
             // 使用我们的顶部栏组件
             AuthTopBar(
                 viewModel,

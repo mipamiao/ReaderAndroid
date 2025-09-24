@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.BookInfoEditDialogController
 import com.mipa.readerandroid.base.CDMap
+import com.mipa.readerandroid.base.combineHost
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.composedata.BookInfoEditCD
@@ -37,12 +39,10 @@ import com.mipa.readerandroid.view.composedata.BookInfoEditCD
 //todo 对于进行耗时操作或有error的compose，是否可以分为加载界面，错误界面，正常界面，以及上或下的bar这4部分
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun BookEditScreen(
-    book: Book,
-    onCancel: () -> Unit
-) {
+fun BookEditScreen(controller: BookInfoEditDialogController) {
 
     val viewModel = CDMap.get<BookInfoEditCD>()
+    val onCancel = {controller.dismiss()}
 
 
 
@@ -126,7 +126,7 @@ fun BookEditScreen(
                             if (viewModel.coverImage.value != null) {
                                 val painter = rememberAsyncImagePainter(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(viewModel.coverImage.value)
+                                        .data(viewModel.coverImage.value.combineHost())
                                         .placeholder(R.drawable.default_avatar)
                                         .error(R.drawable.default_avatar)
                                         .crossfade(true)

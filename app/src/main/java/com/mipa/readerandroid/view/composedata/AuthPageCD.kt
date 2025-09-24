@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
+import com.mipa.readerandroid.base.DialogController
 import com.mipa.readerandroid.model.dto.UserLoginRequest
 import com.mipa.readerandroid.model.dto.UserRegisterRequest
 import com.mipa.readerandroid.service.UserService
@@ -27,10 +28,13 @@ class AuthPageCD: BaseCD() {
     var register_email = mutableStateOf("")
     var register_password = mutableStateOf("")
 
+    val dialogController = DialogController()
+
     @SuppressLint("CheckResult")
     fun register(naviController: NavHostController) {
+        dialogController.show()
         Observable.fromCallable {
-            //ConstValue.delay()
+            ConstValue.delay()
             val res = UserService.register(
                 UserRegisterRequest(
                     userName = register_name.value,
@@ -46,6 +50,7 @@ class AuthPageCD: BaseCD() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { res ->
                 if (res) isLoginScreen.value = true
+                dialogController.dismiss()
             }
     }
 
@@ -58,9 +63,9 @@ class AuthPageCD: BaseCD() {
 
     @SuppressLint("CheckResult")
     fun login(naviController: NavHostController) {
-
+        dialogController.show()
         Observable.fromCallable {
-            //ConstValue.delay()
+            ConstValue.delay()
             val res = UserService.login(
                 UserLoginRequest(
                     userName = login_name.value,
@@ -72,6 +77,7 @@ class AuthPageCD: BaseCD() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { res ->
+                dialogController.dismiss()
                 res.ifPresent {
                     CDMap.get<MePageCD>().updateUserProfile(res.get())
                     naviController.navigate(ConstValue.ROUTER_MEPAGE) {
@@ -79,6 +85,7 @@ class AuthPageCD: BaseCD() {
                         popUpTo(0)
                     }
                 }
+                ConstValue.showOPstate(res.isPresent)
             }
     }
 

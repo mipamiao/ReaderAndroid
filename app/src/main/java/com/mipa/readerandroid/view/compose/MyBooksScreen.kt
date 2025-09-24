@@ -36,8 +36,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.base.CDMap
+import com.mipa.readerandroid.base.combineHost
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
+import com.mipa.readerandroid.view.compose.dialog.BookInfoEditDialog
 import com.mipa.readerandroid.view.composedata.MyBookPageCD
 
 @Composable
@@ -49,7 +51,6 @@ fun MyBooksScreen() {
     val myBooks = viewModel.books
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
-
 
 
     val naviController = LocalNavController.current
@@ -70,7 +71,7 @@ fun MyBooksScreen() {
         }
     }
 
-    BookInfoEditDialog(viewModel)
+    BookInfoEditDialog(viewModel.bookInfoEditDialogController)
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -187,7 +188,7 @@ fun MyBookItem(
                     // 实际项目中可以使用Coil等库加载网络图片
                     val painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(book.coverImage)
+                            .data(book.coverImage?.combineHost())
                             .placeholder(R.drawable.default_avatar)
                             .error(R.drawable.default_avatar)
                             .crossfade(true)
@@ -262,25 +263,25 @@ fun MyBookItem(
     }
 }
 
-@Composable
-fun BookInfoEditDialog(viewModel: MyBookPageCD) {
-    if (viewModel.showEditDialog.value) {
-        Dialog(
-            onDismissRequest = { viewModel.showEditDialog.value = false }
-        ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.9f),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                viewModel.currentBook?.let {
-                    BookEditScreen(
-                        book = it,
-                        onCancel = { viewModel.showEditDialog.value = false }
-                    )
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun BookInfoEditDialog(viewModel: MyBookPageCD) {
+//    if (viewModel.showEditDialog.value) {
+//        Dialog(
+//            onDismissRequest = { viewModel.showEditDialog.value = false }
+//        ) {
+//            Surface(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .fillMaxHeight(0.9f),
+//                shape = RoundedCornerShape(16.dp)
+//            ) {
+//                viewModel.currentBook?.let {
+//                    BookEditScreen(
+//                        book = it,
+//                        onCancel = { viewModel.showEditDialog.value = false }
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
