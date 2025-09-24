@@ -1,15 +1,10 @@
 package com.mipa.readerandroid.view.composedata
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.mipa.readerandroid.base.ConstValue
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.navigation.NavHostController
@@ -66,5 +61,5 @@ abstract class DatasShowViewModel<T>: BaseCD() {
 
     abstract suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<T>
 
-    abstract fun onBookClick(data: T, naviController: NavHostController)
+    abstract fun onItemClick(data: T, naviController: NavHostController)
 }

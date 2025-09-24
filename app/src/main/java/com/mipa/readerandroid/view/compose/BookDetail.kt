@@ -36,7 +36,6 @@ import com.mipa.readerandroid.view.composedata.ChapterListPageCD
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 
-//todo bugfix：展开简介后目录消失
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -32,10 +32,10 @@ object ChapterService {
         return null
     }
 
-    suspend fun listChapters(bookId: String): List<ChapterInfo> {
-        val res = chapterNao.listChapter(bookId)
+    suspend fun listChapters(bookId: String, pageNumber: Int, pageSize: Int): List<ChapterInfo> {
+        val res = chapterNao.listChapter(bookId, pageNumber, pageSize)
         if(res.isSuccess()){
-            res.data?.let {
+            res.data?.chapters?.let {
                 return it
             }
         }

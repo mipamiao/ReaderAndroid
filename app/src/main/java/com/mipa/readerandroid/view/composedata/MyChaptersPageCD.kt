@@ -14,11 +14,15 @@ import kotlinx.coroutines.withContext
 
 class MyChaptersPageCD: ChaptersShowViewModel(){
 
-    override suspend fun getMoreData(): List<ChapterInfo> {
+    override suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<ChapterInfo> {
         book.value.bookId?.let {
-            return ChapterService.listChapters(it)
+            return ChapterService.listChapters(it, pageNumber, pageSize)
         }
         return emptyList()
+    }
+
+    override fun onItemClick(data: ChapterInfo, naviController: NavHostController) {
+        TODO("Not yet implemented")
     }
 
     fun onDeleteClick(chapterInfo: ChapterInfo) {
@@ -32,7 +36,7 @@ class MyChaptersPageCD: ChaptersShowViewModel(){
                 }
             }
             ConstValue.showOPstate(result)
-            if (result == true) chapters.remove(chapterInfo)
+            if (result == true) datas.remove(chapterInfo)
         }
     }
 
@@ -44,7 +48,7 @@ class MyChaptersPageCD: ChaptersShowViewModel(){
     }
 
     fun onAddClick(naviController: NavHostController) {
-        CDMap.get<WriterViewCD>().from(book.value.bookId, null,chapters.size + 1)
+        CDMap.get<WriterViewCD>().from(book.value.bookId, null,datas.size + 1)
         naviController.navigate(ConstValue.ROUTER_WRITER_PAGE) {
             launchSingleTop = true
         }

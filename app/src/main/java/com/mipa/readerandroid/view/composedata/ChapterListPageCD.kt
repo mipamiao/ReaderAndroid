@@ -16,19 +16,11 @@ import kotlinx.coroutines.withContext
 
 class ChapterListPageCD : ChaptersShowViewModel() {
 
-    override suspend fun getMoreData(): List<ChapterInfo> {
+    override suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<ChapterInfo> {
         book.value.bookId?.let {
-            return ChapterService.listChapters(it)
+            return ChapterService.listChapters(it, pageNumber, pageSize)
         }
         return emptyList()
-    }
-
-    fun onChapterClick(chapterInfo: ChapterInfo, naviControllrt: NavHostController){
-        CDMap.get<ReaderViewCD>().from(book.value.bookId, chapterInfo.chapterId)
-        addLibrary(chapterInfo)
-        naviControllrt.navigate(ConstValue.ROUTER_READER_PAGE) {
-            launchSingleTop = true
-        }
     }
 
     fun addLibrary(chapterInfo: ChapterInfo){
@@ -42,11 +34,18 @@ class ChapterListPageCD : ChaptersShowViewModel() {
             }
             ConstValue.showOPstate(res)
         }
-
     }
 
     override fun from(book: Book){
         setBook(book)
+    }
+
+    override fun onItemClick(data: ChapterInfo, naviController: NavHostController) {
+        CDMap.get<ReaderViewCD>().from(book.value.bookId, data.chapterId)
+        addLibrary(data)
+        naviController.navigate(ConstValue.ROUTER_READER_PAGE) {
+            launchSingleTop = true
+        }
     }
 
 }

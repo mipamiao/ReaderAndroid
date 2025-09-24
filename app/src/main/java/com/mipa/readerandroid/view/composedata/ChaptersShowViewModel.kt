@@ -15,45 +15,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class ChaptersShowViewModel : BaseCD() {
+abstract class ChaptersShowViewModel : DatasShowViewModel<ChapterInfo>() {
 
-    val chapters = mutableStateListOf<ChapterInfo>()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _book = MutableStateFlow(Book())
     val book: StateFlow<Book> = _book
 
-    abstract suspend fun getMoreData(): List<ChapterInfo>
-
-    fun loadMoreData() {
-        if (isLoading.value) return
-        viewModelScope.launch {
-            _isLoading.value = true
-            withContext(Dispatchers.IO) {
-                try {
-                    ConstValue.delay()
-                    book.value.bookId?.let {
-                        chapters.addAll(getMoreData())
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    _isLoading.value = false
-                }
-            }
-
-        }
-    }
-
     fun setBook(book: Book) {
         _book.value = book
-        chapters.clear()
+        datas.clear()
     }
 
     fun clearBooks(){
-        chapters.clear()
+        datas.clear()
     }
 
     fun onBackClick(naviController: NavHostController) {

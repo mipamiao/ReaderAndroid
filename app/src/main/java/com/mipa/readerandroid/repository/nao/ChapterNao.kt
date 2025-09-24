@@ -1,6 +1,7 @@
 package com.mipa.readerandroid.repository.nao
 
 import com.mipa.readerandroid.model.dto.ChapterDto
+import com.mipa.readerandroid.model.dto.ChapterListDTO
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.model.feature.ChapterInfo
 import retrofit2.http.Body
@@ -26,8 +27,10 @@ interface ChapterNao {
 
     @GET("${Domain.chapterPublic}/list")
     suspend fun listChapter(
-        @Query("bookId") bookId: String
-    ): ApiResponse<List<ChapterInfo>>
+        @Query("bookId") bookId: String,
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int,
+    ): ApiResponse<ChapterListDTO>
 
     @POST("${Domain.chapterPrivate}/add")
     suspend fun addChapter(
