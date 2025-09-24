@@ -7,16 +7,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
+import com.mipa.readerandroid.base.DialogController
 import com.mipa.readerandroid.model.dto.UserLoginRequest
 import com.mipa.readerandroid.model.dto.UserRegisterRequest
 import com.mipa.readerandroid.service.UserService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Optional
 
 class AuthPageCD: BaseCD() {
@@ -27,10 +32,13 @@ class AuthPageCD: BaseCD() {
     var register_email = mutableStateOf("")
     var register_password = mutableStateOf("")
 
+    val dialogController = DialogController()
+
     @SuppressLint("CheckResult")
     fun register(naviController: NavHostController) {
+        dialogController.show()
         Observable.fromCallable {
-            //ConstValue.delay()
+            ConstValue.delay()
             val res = UserService.register(
                 UserRegisterRequest(
                     userName = register_name.value,
@@ -46,6 +54,7 @@ class AuthPageCD: BaseCD() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { res ->
                 if (res) isLoginScreen.value = true
+                dialogController.dismiss()
             }
     }
 
@@ -58,28 +67,31 @@ class AuthPageCD: BaseCD() {
 
     @SuppressLint("CheckResult")
     fun login(naviController: NavHostController) {
+        dialogController.show()
 
-        Observable.fromCallable {
-            //ConstValue.delay()
-            val res = UserService.login(
-                UserLoginRequest(
-                    userName = login_name.value,
-                    password = login_password.value
+        viewModelScope.launch {
+            val res = withContext(Dispatchers.IO) {
+                ConstValue.delay()
+                UserService.login(
+                    UserLoginRequest(
+                        userName = login_name.value,
+                        password = login_password.value
+                    )
                 )
-            )
-            Optional.ofNullable(res)
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { res ->
-                res.ifPresent {
-                    CDMap.get<MePageCD>().updateUserProfile(res.get())
-                    naviController.navigate(ConstValue.ROUTER_MEPAGE) {
-                        launchSingleTop = true
-                        popUpTo(0)
-                    }
+            }
+            dialogController.dismiss()
+            res?.let {
+                CDMap.get<MePageCD>().updateUserProfile(res)
+                naviController.navigate(ConstValue.ROUTER_MEPAGE) {
+                    launchSingleTop = true
+                    popUpTo(0)
+                }
+                withContext(Dispatchers.IO) {
+                    UserService.saveUserProfile(res)
                 }
             }
+            ConstValue.showOPstate(res != null)
+        }
     }
 
     fun switchToRegister(){

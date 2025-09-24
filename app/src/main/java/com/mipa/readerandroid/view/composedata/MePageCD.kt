@@ -48,11 +48,16 @@ class MePageCD : BaseCD() {
         }
     }
 
-    fun quitLogin(naviController: NavHostController){
+    fun quitLogin(naviController: NavHostController) {
         updateUserProfile(UserProfile())
-        naviController.navigate(ConstValue.ROUTER_MEPAGE){
+        naviController.navigate(ConstValue.ROUTER_MEPAGE) {
             launchSingleTop = true
             popUpTo(0)
+        }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                UserService.clearUserProfile()
+            }
         }
     }
 

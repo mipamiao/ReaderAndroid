@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.BookInfoEditDialogController
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.base.MyApp
@@ -17,7 +18,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class MyBookPageCD: BooksShowViewModel(){
 
     val showEditDialog =  mutableStateOf(false)
-    var currentBook: Book? = null
+    //var currentBook: Book? = null
+
+    val bookInfoEditDialogController = BookInfoEditDialogController()
 
     override fun getMoreData(pageNumber: Int, pageSize: Int): List<Book> {
         return BookService.getMyBookList(pageNumber, pageSize)
@@ -29,15 +32,15 @@ class MyBookPageCD: BooksShowViewModel(){
     }
 
     fun onBookEditClick(book: Book, naviController: NavHostController){
-        currentBook = Book()
-        showEditDialog.value = true
+        bookInfoEditDialogController.book = Book()
+        bookInfoEditDialogController.show()
         CDMap.get<BookInfoEditCD>().from(book)
     }
 
     fun onBookAddClick(){
-        currentBook = Book()
-        showEditDialog.value = true
-        CDMap.get<BookInfoEditCD>().from(currentBook!!)
+        bookInfoEditDialogController.book = Book()
+        bookInfoEditDialogController.show()
+        CDMap.get<BookInfoEditCD>().from(bookInfoEditDialogController.book!!)
     }
 
     fun onBookRemoveClick(book: Book){

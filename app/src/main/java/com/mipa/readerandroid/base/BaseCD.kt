@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 open class BaseCD : ViewModel() {
 
 
+
     open fun onBackClick(){
         CDMap.del(this)
     }

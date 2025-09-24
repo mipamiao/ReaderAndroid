@@ -28,6 +28,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.ui.theme.ReaderAndroidTheme
 
 @Composable
@@ -58,12 +59,13 @@ fun IconAndTextItem(
             imageVector = icon,
             contentDescription = text,
             tint = iconTint,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.width(spacing))
         Text(
             text = text,
             style = textStyle,
+            fontSize = 24.sp,
             modifier = Modifier.weight(1f)
         )
     }

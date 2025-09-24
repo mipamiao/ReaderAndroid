@@ -33,5 +33,6 @@ class ConstValue {
                 else context.getString(R.string.book_info_op_failed)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
+
     }
 }

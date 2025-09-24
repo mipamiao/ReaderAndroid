@@ -1,6 +1,8 @@
 package com.mipa.readerandroid.repository
 
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.mipa.readerandroid.R
+import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.repository.nao.BookNao
 import com.mipa.readerandroid.repository.nao.ChapterNao
@@ -14,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object AppNet {
-    const val BASE_URL = "http://10.12.57.22:8080"
+    var BASE_URL = "http://" + MyApp.getInstance().getContext().getString(R.string.host)
 
     // 创建日志拦截器
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

@@ -26,10 +26,10 @@ interface UserDao {
     fun update(user: UserEntity)
 
     @Delete
-    fun delete(user: UserEntity)
+    suspend fun delete(user: UserEntity)
 
     @Query("DELETE  from users")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     // 使用 Kotlin 协程 (需要 room-ktx)
     @Query("SELECT * FROM users")

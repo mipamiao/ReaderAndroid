@@ -61,8 +61,8 @@ fun PersonalProfileScreen() {
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(avatarUrl.value)
-                        .placeholder(R.drawable.default_avatar)
-                        .error(R.drawable.default_avatar)
+                        .placeholder(R.drawable.offline_avatar)
+                        .error(R.drawable.offline_avatar)
                         .crossfade(true)
                         .build(),
                 )
@@ -80,7 +80,7 @@ fun PersonalProfileScreen() {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = userProfile.userName?:"",
+                    text = userProfile.userName?:"点击登录",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground

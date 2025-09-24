@@ -26,7 +26,7 @@ object UserService {
         AppNet.userNao()
     }
 
-    fun saveUserProfile(userProfile: UserProfile): Boolean{
+    suspend fun saveUserProfile(userProfile: UserProfile): Boolean{
         userDao.deleteAll()
         userDao.insert(UserEntityConverter.fromUserProfile(userProfile))
         return true
@@ -44,22 +44,17 @@ object UserService {
         }
     }
 
-    fun clearUserProfile(){
+    suspend fun clearUserProfile(){
         userDao.deleteAll()
     }
 
-    fun login(userLoginRequest: UserLoginRequest): UserProfile? {
+    suspend fun login(userLoginRequest: UserLoginRequest): UserProfile? {
         try {
-            val call = userNao.login(userLoginRequest)
-            val response = call.execute()
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    if (it.isSuccess()) {
-                        it.data?.let { data ->
-                            TokenMgr.setToken(data.token)
-                            return UserProfileConverter.fromUserLoginResponse(data.userInfo)
-                        }
-                    }
+            val res = userNao.login(userLoginRequest)
+            if (res.isSuccess()) {
+                res.data?.let { data ->
+                    TokenMgr.setToken(data.token)
+                    return UserProfileConverter.fromUserLoginResponse(data.userInfo)
                 }
             }
             return null
