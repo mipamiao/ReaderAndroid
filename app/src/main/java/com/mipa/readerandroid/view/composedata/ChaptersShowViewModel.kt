@@ -21,6 +21,8 @@ abstract class ChaptersShowViewModel : DatasShowViewModel<ChapterInfo>() {
     private val _book = MutableStateFlow(Book())
     val book: StateFlow<Book> = _book
 
+    var chapterNum: Int? = null
+
     fun setBook(book: Book) {
         _book.value = book
         datas.clear()

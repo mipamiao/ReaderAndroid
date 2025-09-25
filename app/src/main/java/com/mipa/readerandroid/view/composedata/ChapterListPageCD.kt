@@ -16,9 +16,13 @@ import kotlinx.coroutines.withContext
 
 class ChapterListPageCD : ChaptersShowViewModel() {
 
+
+
     override suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<ChapterInfo> {
         book.value.bookId?.let {
-            return ChapterService.listChapters(it, pageNumber, pageSize)
+            val res = ChapterService.listChapters(it, pageNumber, pageSize)
+            if (chapterNum == null) chapterNum = res.second
+            return res.first
         }
         return emptyList()
     }

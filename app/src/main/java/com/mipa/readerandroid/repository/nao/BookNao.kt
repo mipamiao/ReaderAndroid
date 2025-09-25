@@ -19,43 +19,43 @@ import retrofit2.http.Query
 interface BookNao {
 
     @GET("${Domain.bookPublic}/list")
-    fun getBookList(
+    suspend fun getBookList(
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int,
         @Query("category") category: String?
-    ): Call<ApiResponse<BookListDto>>
+    ): ApiResponse<BookListDto>
 
     @GET("${Domain.bookPivate}/my-books")
-    fun getMyBookList(
+    suspend fun getMyBookList(
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int,
         @Header("Authorization") token: String
-    ): Call<ApiResponse<BookListDto>>
+    ): ApiResponse<BookListDto>
 
     @GET("${Domain.bookPublic}/get")
-    fun getBook(
+    suspend fun getBook(
         @Query("bookId") bookId: String
-    ): Call<ApiResponse<Book>>
+    ): ApiResponse<Book>
 
     @POST("${Domain.bookPivate}/add")
-    fun addBook(
+    suspend fun addBook(
         @Header("Authorization") token: String,
         @Body bookDto: Book
-    ): Call<ApiResponse<Boolean>>
+    ): ApiResponse<Boolean>
 
     @POST("${Domain.bookPivate}/update")
-    fun updateBook(
+    suspend fun updateBook(
         @Header("Authorization") token: String,
         @Body bookDto: Book,
         @Query("bookId") bookId: String
-    ): Call<ApiResponse<Boolean>>
+    ): ApiResponse<Boolean>
 
     @DELETE("${Domain.bookPivate}/remove")
     @Headers("Content-Type: application/json")
-    fun removeBook(
+    suspend fun removeBook(
         @Header("Authorization") token: String,
         @Query("bookId") bookId: String
-    ): Call<ApiResponse<Boolean>>
+    ): ApiResponse<Boolean>
 
     @Multipart
     @POST("${Domain.bookPivate}/update-cover-image")

@@ -64,29 +64,22 @@ object UserService {
         }
     }
 
-    fun register(userRegisterRequest: UserRegisterRequest): Boolean {
+    suspend fun register(userRegisterRequest: UserRegisterRequest): Boolean {
         try {
-            val call = userNao.register(userRegisterRequest)
-            val response = call.execute()
-            response.body()?.let {
-                return it.isSuccess()
-            }
-            return false
+            val response = userNao.register(userRegisterRequest)
+            return response.isSuccess()
         } catch (e: Exception) {
             Log.e(TAG, "register: $e")
             return false
         }
     }
 
-    fun getUserInfo(userId: String): UserProfile? {
+    suspend fun getUserInfo(userId: String): UserProfile? {
         try {
-            val call = userNao.getUserProfile(TokenMgr.getTokenWithPrefix(), userId)
-            val response = call.execute()
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    if (it.isSuccess() && it.data != null) {
-                        return UserProfileConverter.fromuUserInfoResponse(it.data)
-                    }
+            val res = userNao.getUserProfile(TokenMgr.getTokenWithPrefix(), userId)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return UserProfileConverter.fromuUserInfoResponse(it)
                 }
             }
             return null

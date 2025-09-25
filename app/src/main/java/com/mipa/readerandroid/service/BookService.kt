@@ -18,84 +18,80 @@ object BookService {
         AppNet.bookNao()
     }
 
-    fun getMoreBookList(pageNumber: Int, pageSize: Int, category: String? = null): List<Book> {
-        val call = bookNao.getBookList(pageNumber, pageSize, category)
-        val res = call.execute()
-        var books: List<Book> = listOf()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess() && it.data != null) {
-                    books = it.data.books
+    suspend fun getMoreBookList(pageNumber: Int, pageSize: Int, category: String? = null): List<Book> {
+        try {
+            val res = bookNao.getBookList(pageNumber, pageSize, category)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return it.books
                 }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "getMoreBookList: $e")
+            return emptyList()
         }
-        return books
+        return emptyList()
     }
 
-    fun getMyBookList(pageNumber: Int, pageSize: Int): List<Book>{
-        val call = bookNao.getMyBookList(pageNumber, pageSize, TokenMgr.getTokenWithPrefix())
-        val res = call.execute()
-        var books: List<Book> = listOf()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess() && it.data != null) {
-                    books = it.data.books?:listOf()
+    suspend fun getMyBookList(pageNumber: Int, pageSize: Int): List<Book>{
+        try {
+            val res = bookNao.getMyBookList(pageNumber, pageSize, TokenMgr.getTokenWithPrefix())
+            if(res.isSuccess()){
+                res.data?.let {
+                    return it.books
                 }
             }
+        }catch (e: Exception){
+            Log.e(TAG, "getMyBookList: $e")
+            return emptyList()
         }
-        return books
+        return emptyList()
     }
 
-    fun getBook(bookId: String): Book? {
-        val call = bookNao.getBook(bookId)
-        val res = call.execute()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess() && it.data != null) {
-                    return it.data
+    suspend fun getBook(bookId: String): Book? {
+        try {
+            val res = bookNao.getBook(bookId)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return it
                 }
             }
+        }catch (e: Exception){
+            Log.e(TAG, "getBook: $e")
+            return null
         }
         return null
     }
 
-    fun addBook(book: Book): Boolean{
-        val call = bookNao.addBook(TokenMgr.getTokenWithPrefix(), book)
-        val res = call.execute()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess()) {
-                    return true
-                }
-            }
+    suspend fun addBook(book: Book): Boolean{
+        try {
+            val res = bookNao.addBook(TokenMgr.getTokenWithPrefix(), book)
+            return res.isSuccess()
+        }catch (e: Exception){
+            Log.e(TAG, "addBook: $e")
+            return false
         }
-        return false
+
     }
 
-    fun updateBook(bookId: String, book: Book): Boolean {
-        val call = bookNao.updateBook(TokenMgr.getTokenWithPrefix(), book, bookId)
-        val res = call.execute()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess()) {
-                    return true
-                }
-            }
+    suspend fun updateBook(bookId: String, book: Book): Boolean {
+        try {
+            val res = bookNao.updateBook(TokenMgr.getTokenWithPrefix(), book, bookId)
+            return res.isSuccess()
+        }catch (e: Exception){
+            Log.e(TAG, "updateBook: $e")
+            return false
         }
-        return false
     }
 
-    fun removeBook(bookId: String): Boolean {
-        val call = bookNao.removeBook(TokenMgr.getTokenWithPrefix(), bookId)
-        val res = call.execute()
-        if (res.isSuccessful) {
-            res.body()?.let {
-                if (it.isSuccess()) {
-                    return true
-                }
-            }
+    suspend fun removeBook(bookId: String): Boolean {
+        try {
+            val res = bookNao.removeBook(TokenMgr.getTokenWithPrefix(), bookId)
+            return res.isSuccess()
+        }catch (e: Exception){
+            Log.e(TAG, "removeBook: $e")
+            return false
         }
-        return false
     }
 
     suspend fun updateCoverImg(uri: Uri, bookId: String): String? {

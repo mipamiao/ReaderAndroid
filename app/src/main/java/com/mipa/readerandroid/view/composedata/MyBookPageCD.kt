@@ -3,6 +3,7 @@ package com.mipa.readerandroid.view.composedata
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.base.BookInfoEditDialogController
@@ -14,20 +15,21 @@ import com.mipa.readerandroid.service.BookService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MyBookPageCD: BooksShowViewModel(){
 
-    val showEditDialog =  mutableStateOf(false)
-    //var currentBook: Book? = null
 
     val bookInfoEditDialogController = BookInfoEditDialogController()
 
-    override fun getMoreData(pageNumber: Int, pageSize: Int): List<Book> {
+    override suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<Book> {
         return BookService.getMyBookList(pageNumber, pageSize)
     }
 
-    override fun onBookClick(book: Book, naviController: NavHostController) {
-        CDMap.get<MyChaptersPageCD>().from(book)
+    override fun onItemClick(data: Book, naviController: NavHostController) {
+        CDMap.get<MyChaptersPageCD>().from(data)
         naviController.navigate(ConstValue.ROUTER_MY_CHAPTERS_LIST)
     }
 
@@ -43,22 +45,17 @@ class MyBookPageCD: BooksShowViewModel(){
         CDMap.get<BookInfoEditCD>().from(bookInfoEditDialogController.book!!)
     }
 
-    fun onBookRemoveClick(book: Book){
-        if (book.bookId == null) return
-        val disposable = Observable.fromCallable {
-            ConstValue.delay()
-            BookService.removeBook(book.bookId!!)
-        }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {result->
-                    ConstValue.showOPstate(result)
-                    if(result)books.remove(book)
-                },
-                { error ->
-                    error.printStackTrace()
+    fun onBookRemoveClick(book: Book) {
+        book.bookId?.let { bookId ->
+            viewModelScope.launch {
+                val res = withContext(Dispatchers.IO) {
+                    ConstValue.delay()
+                    BookService.removeBook(bookId)
                 }
-            )
+                ConstValue.showOPstate(res)
+                if (res) datas.remove(book)
+            }
+        }
     }
 
 

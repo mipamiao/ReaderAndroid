@@ -62,7 +62,7 @@ fun ChapterListScreen() {
             .fillMaxSize()
     ) {
         Column {
-            ChapterListHeader(chapters.size)
+            ChapterListHeader(viewModel.chapterNum?:0)
             // 章节列表
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

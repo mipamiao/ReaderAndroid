@@ -30,9 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.mipa.readerandroid.base.CDMap
@@ -45,7 +42,7 @@ import com.mipa.readerandroid.view.composedata.MyBookPageCD
 @Composable
 fun MyBooksScreen() {
     val viewModel: MyBookPageCD = CDMap.get<MyBookPageCD>()
-    val myBooks = viewModel.books
+    val myBooks = viewModel.datas
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
 
@@ -68,7 +65,7 @@ fun MyBooksScreen() {
 
     if (isAtBottom.value && !isLoading && hasMoreData) {
         LaunchedEffect(true) {
-            viewModel.loadMoreBooks()
+            viewModel.loadMoreDatas()
         }
     }
 
@@ -131,7 +128,7 @@ fun MyBooksScreen() {
                         MyBookItem(
                             book = myBooks[it],
                             onBookClick={book->
-                                viewModel.onBookClick(book, naviController)
+                                viewModel.onItemClick(book, naviController)
                             },
                             onEditClick = { book ->
                                 viewModel.onBookEditClick(book, naviController)

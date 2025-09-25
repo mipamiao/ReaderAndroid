@@ -2,19 +2,19 @@ package com.mipa.readerandroid.view.composedata
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.service.BookService
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.Optional
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 
 class BookDetailCD :BaseCD() {
     private val _bookId = mutableStateOf("")
@@ -23,7 +23,7 @@ class BookDetailCD :BaseCD() {
     private val _book = mutableStateOf(Book())
     val book: State<Book> = _book
 
-    private val _isLoading = MutableStateFlow(true)
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     var disposable:Disposable? = null
@@ -36,20 +36,17 @@ class BookDetailCD :BaseCD() {
         _book.value = book
     }
 
-    fun loadBook(){
-        disposable = Observable.fromCallable {
-            _isLoading.value = true
-            ConstValue.delay()
-            Optional.ofNullable(BookService.getBook(_bookId.value))
-        }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ bookOpt ->
-                bookOpt.ifPresent { _book.value = bookOpt.get() }
-                _isLoading.value = false
-            }, { error ->
-                error.printStackTrace()
-                _isLoading.value = false
-            })
+    fun loadBook() {
+        if (_isLoading.value) return
+        _isLoading.value = true
+        viewModelScope.launch {
+            val res = withContext(Dispatchers.IO) {
+                ConstValue.delay()
+                BookService.getBook(_bookId.value)
+            }
+            res?.let { _book.value = res }
+            _isLoading.value = false
+        }
     }
 
     fun cancelLoad(){

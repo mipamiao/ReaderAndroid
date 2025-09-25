@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface SearchNao {
 
     @GET("${Domain.searchPublic}/books")
-    public suspend fun searchByKeyword(
+    suspend fun searchByKeyword(
         @Query("keyword") keyword: String,
         @Query("pageNumber") pageNumber: Int,
         @Query("pageSize") pageSize: Int
