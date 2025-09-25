@@ -130,7 +130,7 @@ fun MyChapterListPageTopBar(){
         title = {
             Column {
                 Text(currentBook.title ?: "default", maxLines = 1, fontSize = 16.sp)
-                Text("章节管理 (${chapters.size}章)", maxLines = 1, fontSize = 12.sp)
+                Text("章节管理 (${viewModel.chapterNum}章)", maxLines = 1, fontSize = 12.sp)
             }
         },
         navigationIcon = {

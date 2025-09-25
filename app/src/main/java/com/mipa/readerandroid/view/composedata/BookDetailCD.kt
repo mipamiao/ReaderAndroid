@@ -23,7 +23,7 @@ class BookDetailCD :BaseCD() {
     private val _book = mutableStateOf(Book())
     val book: State<Book> = _book
 
-    private val _isLoading = MutableStateFlow(true)
+    private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     var disposable:Disposable? = null
