@@ -38,7 +38,7 @@ fun BookMallScreen() {
         viewModel.refresh()
     }
 
-    val books = viewModel.books
+    val books = viewModel.datas
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
 
@@ -60,7 +60,7 @@ fun BookMallScreen() {
 
     if (isAtBottom.value && !isLoading && hasMoreData) {
         LaunchedEffect(true) {
-            viewModel.loadMoreBooks()
+            viewModel.loadMoreDatas()
         }
     }
 
@@ -90,7 +90,7 @@ fun BookMallScreen() {
                     BookItem(
                         book = books[index],
                         onBookClick = {
-                            viewModel.onBookClick(it, naviController)
+                            viewModel.onItemClick(it, naviController)
                         }
                     )
                 }

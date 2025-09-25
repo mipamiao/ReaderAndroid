@@ -10,24 +10,22 @@ import kotlinx.coroutines.flow.StateFlow
 
 class BookMallCD : BooksShowViewModel() {
 
-    private val _needFlush = MutableStateFlow(false)
-    val needFlush: StateFlow<Boolean> = _needFlush
 
-    override fun getMoreData(pageNumber: Int, pageSize: Int): List<Book> {
+    override suspend fun getMoreData(pageNumber: Int, pageSize: Int): List<Book> {
         return BookService.getMoreBookList(pageNumber, pageSize)
     }
 
 
-    override fun onBookClick(book: Book, naviController: NavHostController) {
+    override fun refresh() {
+        if(datas.isEmpty())super.refresh()
+    }
+
+    override fun onItemClick(data: Book, naviController: NavHostController) {
         val bookDetailCD = CDMap.put(BookDetailCD())
-        book.bookId?.let { bookDetailCD.from(book) }
+        data.bookId?.let { bookDetailCD.from(data) }
         naviController.navigate(ConstValue.ROUTER_BOOK_DETAIL){
             launchSingleTop = true
         }
-    }
-
-    override fun refresh() {
-        if(books.isEmpty())super.refresh()
     }
 
 }

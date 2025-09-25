@@ -34,28 +34,24 @@ class AuthPageCD: BaseCD() {
 
     val dialogController = DialogController()
 
-    @SuppressLint("CheckResult")
     fun register(naviController: NavHostController) {
         dialogController.show()
-        Observable.fromCallable {
-            ConstValue.delay()
-            val res = UserService.register(
-                UserRegisterRequest(
-                    userName = register_name.value,
-                    email = register_email.value,
-                    password = register_password.value,
-                    role = "ROLE_READER"
+        viewModelScope.launch {
+            val res = withContext(Dispatchers.IO) {
+                ConstValue.delay()
+                UserService.register(
+                    UserRegisterRequest(
+                        userName = register_name.value,
+                        email = register_email.value,
+                        password = register_password.value,
+                        role = "ROLE_READER"
+                    )
                 )
-            )
-            Log.e("TAG", "register: ${res.toString()}")
-            res
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { res ->
-                if (res) isLoginScreen.value = true
-                dialogController.dismiss()
             }
+            Log.e("TAG", "register: ${res.toString()}")
+            if (res) switchToLogin()
+            dialogController.dismiss()
+        }
     }
 
     fun switchToLogin(){
@@ -65,7 +61,6 @@ class AuthPageCD: BaseCD() {
     var login_name = mutableStateOf("")
     var login_password = mutableStateOf("")
 
-    @SuppressLint("CheckResult")
     fun login(naviController: NavHostController) {
         dialogController.show()
 

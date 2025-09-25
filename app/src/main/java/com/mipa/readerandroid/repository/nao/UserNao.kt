@@ -21,13 +21,13 @@ interface UserNao {
     suspend fun login(@Body userLoginRequest: UserLoginRequest): ApiResponse<UserLoginResponse>
 
     @POST("${Domain.authPublic}/register")
-    fun register(@Body userRegisterRequest: UserRegisterRequest): Call<ApiResponse<Boolean>>
+    suspend fun register(@Body userRegisterRequest: UserRegisterRequest): ApiResponse<Boolean>
 
     @GET("${Domain.authPrivate}/profile")
-    fun getUserProfile(
+    suspend fun getUserProfile(
         @Header("Authorization") token: String,
         @Query("userId") useId: String
-    ): Call<ApiResponse<UserInfoResponse>>
+    ): ApiResponse<UserInfoResponse>
 
     @Multipart
     @POST("${Domain.authPrivate}/update-avatar")
