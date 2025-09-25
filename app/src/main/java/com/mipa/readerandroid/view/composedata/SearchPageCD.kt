@@ -26,7 +26,7 @@ class SearchPageCD: DatasShowViewModel<Book>() {
         return SearchService.searchByKeyword(keyword, pageNumber, pageSize)
     }
 
-    override fun onBookClick(data: Book, naviController: NavHostController) {
+    override fun onItemClick(data: Book, naviController: NavHostController) {
         data.bookId?.let { CDMap.get<BookDetailCD>().from(data) }
         naviController.navigate(ConstValue.ROUTER_BOOK_DETAIL){
             launchSingleTop = true

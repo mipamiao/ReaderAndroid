@@ -17,7 +17,7 @@ class BookShelfPageCD : DatasShowViewModel<Library>() {
         return LibraryService.listLibrary(pageNumber, pageSize)
     }
 
-    override fun onBookClick(data: Library, naviController: NavHostController) {
+    override fun onItemClick(data: Library, naviController: NavHostController) {
         CDMap.get<ReaderViewCD>().from(data.book?.bookId, data.chapterInfo?.chapterId)
         naviController.navigate(ConstValue.ROUTER_READER_PAGE)
     }

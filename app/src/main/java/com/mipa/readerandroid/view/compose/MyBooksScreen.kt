@@ -45,9 +45,6 @@ import com.mipa.readerandroid.view.composedata.MyBookPageCD
 @Composable
 fun MyBooksScreen() {
     val viewModel: MyBookPageCD = CDMap.get<MyBookPageCD>()
-    LaunchedEffect(Unit) {
-        viewModel.refresh()
-    }
     val myBooks = viewModel.books
     val isLoading by viewModel.isLoading.collectAsState()
     val hasMoreData by viewModel.hasMoreData.collectAsState()
@@ -63,6 +60,10 @@ fun MyBooksScreen() {
             val totalItemsCount = listState.layoutInfo.totalItemsCount
             lastVisibleItemIndex != null && lastVisibleItemIndex == totalItemsCount - 1
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
     }
 
     if (isAtBottom.value && !isLoading && hasMoreData) {

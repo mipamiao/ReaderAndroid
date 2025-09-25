@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -30,98 +31,103 @@ import com.mipa.readerandroid.view.composedata.MyChaptersPageCD
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import com.mipa.readerandroid.base.CDMap
+import com.mipa.readerandroid.view.compose.base.LoadingCompose
 
 //todo 从writerView返回没必要重新请求章节列表
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyChaptersPageScreen() {
     val viewModel = CDMap.get<MyChaptersPageCD>()
-    val chapters = viewModel.chapters
+    val chapters = viewModel.datas
     val isLoading by viewModel.isLoading.collectAsState()
+    val hasMoreData by viewModel.hasMoreData.collectAsState()
     val currentBook by viewModel.book.collectAsState()
 
     val naviController = LocalNavController.current
 
     // 加载章节数据
     LaunchedEffect(currentBook) {
-        viewModel.clearBooks()
-        viewModel.loadMoreData()
+        viewModel.refresh()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(currentBook.title?:"default", maxLines = 1, fontSize = 16.sp)
-                        Text("章节管理 (${chapters.size}章)", maxLines = 1, fontSize = 12.sp)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { naviController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
-                    }
-                },
-                actions = {
-                    // 添加章节按钮
-                    IconButton(onClick = { viewModel.onAddClick(naviController) }) {
-                        Icon(Icons.Default.Add, contentDescription = "添加章节")
-                    }
-                }
-            )
+    val listState = rememberLazyListState()
+
+    val isAtBottom = remember {
+        derivedStateOf {
+            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            lastVisibleItemIndex != null && lastVisibleItemIndex == totalItemsCount - 1
         }
+    }
+
+    if (isAtBottom.value && !isLoading && hasMoreData) {
+        LaunchedEffect(true) {
+            viewModel.loadMoreDatas()
+        }
+    }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
+
+        // 章节列表
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            state = listState
         ) {
+            items(chapters, key = { it.chapterId!! }) { chapterInfo ->
+                AuthorChapterItem(
+                    chapterinfo = chapterInfo,
+                    onChapterClick = { viewModel.onEditClick(chapterInfo, naviController) },
+                    onEditClick = { viewModel.onEditClick(chapterInfo, naviController) },
+                    onDeleteClick = { viewModel.onDeleteClick(chapterInfo) }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            // 加载指示器
             if (isLoading) {
-                // 加载状态
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                    Text(text = "加载章节中...", modifier = Modifier.padding(top = 16.dp))
+                item {
+                    LoadingCompose()
                 }
-            } else if (chapters.isEmpty()) {
-                // 空状态
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Default.Book,
-                        contentDescription = "无章节",
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                    Text(text = "暂无章节，点击右上角添加", modifier = Modifier.padding(top = 16.dp))
-                    // 快捷添加按钮
-                    Button(
-                        onClick = { viewModel.onAddClick(naviController) },
-                        modifier = Modifier.padding(top = 16.dp)
-                    ) {
-                        Text("立即添加第一章")
-                    }
-                }
-            } else {
-                // 章节列表
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items(chapters,key = {it.chapterId!!}) { chapterInfo ->
-                        AuthorChapterItem(
-                            chapterinfo = chapterInfo,
-                            onChapterClick = { viewModel.onEditClick(chapterInfo, naviController) },
-                            onEditClick = { viewModel.onEditClick(chapterInfo, naviController) },
-                            onDeleteClick = { viewModel.onDeleteClick(chapterInfo) }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+            }
+            if (!hasMoreData) {
+                item {
+                    if (chapters.isEmpty()) {
+                        // 空状态
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Default.Book,
+                                contentDescription = "无章节",
+                                modifier = Modifier.size(64.dp),
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                            Text(
+                                text = "暂无章节，点击右上角添加",
+                                modifier = Modifier.padding(top = 16.dp)
+                            )
+                            // 快捷添加按钮
+                            Button(
+                                onClick = { viewModel.onAddClick(naviController) },
+                                modifier = Modifier.padding(top = 16.dp)
+                            ) {
+                                Text("立即添加第一章")
+                            }
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "已经到底啦~")
+                        }
                     }
                 }
             }
