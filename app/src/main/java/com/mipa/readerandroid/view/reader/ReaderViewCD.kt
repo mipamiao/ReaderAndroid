@@ -55,6 +55,19 @@ class ReaderViewCD: BaseCD() {
         pages.addAll(extraPages)
     }
 
+    fun lastPage(){
+        menuController.dismiss()
+    }
+
+    fun nextPage(){
+        menuController.dismiss()
+    }
+
+
+    fun switchMenu(){
+        menuController.switch()
+    }
+
 
     fun onClickFontStyleItem() {
 

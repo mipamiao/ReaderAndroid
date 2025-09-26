@@ -203,7 +203,7 @@ fun ReaderBottomMenuDialog(controller: DialogControllerWithAnim){
     if(controller.canShow()){
         Popup (
             onDismissRequest = {
-                controller.dismiss()
+                //controller.dismiss()
             },
             alignment = Alignment.BottomCenter
         ) {

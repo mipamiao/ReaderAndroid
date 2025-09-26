@@ -26,6 +26,14 @@ class DialogControllerWithAnim: DialogController() {
         }
     }
 
+    fun switch(){
+        when(state.value){
+            DialogState.showing, DialogState.dismissing -> return
+            DialogState.show->dismiss()
+            DialogState.dismiss->show()
+        }
+    }
+
     fun endShowing() {
         _state.value = DialogState.show
     }

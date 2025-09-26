@@ -119,14 +119,13 @@ fun ReaderScreen() {
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = { offset ->
-                            // 根据点击位置判断翻页或切换控制栏
                             val screenWidth = size.width
                             if (offset.x < screenWidth / 3) {
-                                //viewModel.previousPage()
+                                viewModel.lastPage()
                             } else if (offset.x > screenWidth * 2 / 3) {
-                                //viewModel.nextPage()
+                                viewModel.nextPage()
                             } else {
-                                viewModel.menuController.show()
+                                viewModel.switchMenu()
                             }
                         }
                     )
