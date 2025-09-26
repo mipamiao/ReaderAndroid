@@ -1,7 +1,10 @@
 package com.mipa.readerandroid.view.reader
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
@@ -13,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.max
+import kotlin.math.min
 
 class ReaderViewCD: BaseCD() {
 
@@ -55,12 +60,21 @@ class ReaderViewCD: BaseCD() {
         pages.addAll(extraPages)
     }
 
-    fun lastPage(){
-        menuController.dismiss()
+    @OptIn(ExperimentalFoundationApi::class)
+    fun lastPage(pagerState: PagerState) {
+        if (menuController.dismiss()) return
+        viewModelScope.launch {
+            pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
+        }
+
     }
 
-    fun nextPage(){
-        menuController.dismiss()
+    @OptIn(ExperimentalFoundationApi::class)
+    fun nextPage(pagerState: PagerState) {
+        if (menuController.dismiss()) return
+        viewModelScope.launch {
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+        }
     }
 
 

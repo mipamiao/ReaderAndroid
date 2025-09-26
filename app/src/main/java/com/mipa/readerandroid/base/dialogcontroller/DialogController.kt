@@ -9,8 +9,10 @@ open class DialogController {
         get() = showState.value
     var callBackSet: MutableSet<DialogCallBack> = mutableSetOf()
 
-    open fun show() {
+    open fun show(): Boolean {
+        val result = !showState.value
         showState.value = true
+        return result
     }
 
     fun onShow(){
@@ -19,8 +21,10 @@ open class DialogController {
         }
     }
 
-    open fun dismiss() {
+    open fun dismiss(): Boolean {
+        val result = showState.value
         showState.value = false
+        return result
     }
 
     fun onDismiss(){

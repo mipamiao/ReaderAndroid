@@ -40,7 +40,7 @@ import com.mipa.readerandroid.view.composedata.BookInfoEditCD
 fun BookEditScreen(controller: BookInfoEditDialogController) {
 
     val viewModel = CDMap.get<BookInfoEditCD>()
-    val onCancel = {controller.dismiss()}
+    val onCancel:()->Unit = {controller.dismiss()}
 
 
 

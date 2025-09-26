@@ -12,18 +12,22 @@ class DialogControllerWithAnim: DialogController() {
         return state.value != DialogState.dismiss
     }
 
-    override fun show() {
+    override fun show(): Boolean {
         if (_state.value == DialogState.dismiss) {
             showState.value = true
             _state.value = DialogState.showing
+            return true
         }
+        return false
     }
 
-    override fun dismiss() {
+    override fun dismiss(): Boolean {
         if (_state.value == DialogState.show) {
             showState.value = false
             _state.value = DialogState.dismissing
+            return true
         }
+        return false
     }
 
     fun switch(){

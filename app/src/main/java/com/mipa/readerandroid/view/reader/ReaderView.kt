@@ -32,6 +32,8 @@ import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.compose.dialog.ReaderBottomMenuDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderTopMenuDialog
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.max
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -60,6 +62,7 @@ fun ReaderScreen() {
     )
 
     val naviController = LocalNavController.current
+    val coroutineScope = rememberCoroutineScope()
 
     // 加载章节数据
     LaunchedEffect(chapter) {
@@ -121,9 +124,13 @@ fun ReaderScreen() {
                         onTap = { offset ->
                             val screenWidth = size.width
                             if (offset.x < screenWidth / 3) {
-                                viewModel.lastPage()
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
+                                }
                             } else if (offset.x > screenWidth * 2 / 3) {
-                                viewModel.nextPage()
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(max(pagerState.currentPage + 1, 0))
+                                }
                             } else {
                                 viewModel.switchMenu()
                             }
@@ -131,7 +138,7 @@ fun ReaderScreen() {
                     )
                 }
         ) {
-            HorizontalPager(state = pagerState) { page ->
+            HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
