@@ -44,45 +44,39 @@ fun ReaderTopMenu(
     onAddBookmark: () -> Unit,
     isVisible: Boolean = true
 ) {
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(),
-        exit = fadeOut()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        TopMenuIconButton(
+            icon = Icons.Filled.ArrowBack,
+            onClick = onExitReading
+        )
+
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(0.6f) // 右侧区域占总宽度的60%
         ) {
             TopMenuIconButton(
-                icon = Icons.Filled.ArrowBack,
-                onClick = onExitReading
+                icon = Icons.Filled.VolumeUp,
+                onClick = onListenBook,
+                modifier = Modifier.padding(end = 8.dp)
             )
 
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(0.6f) // 右侧区域占总宽度的60%
-            ) {
-                TopMenuIconButton(
-                    icon = Icons.Filled.VolumeUp,
-                    onClick = onListenBook,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
+            TopMenuIconButton(
+                icon = Icons.Filled.Comment,
+                onClick = onComment,
+                modifier = Modifier.padding(end = 8.dp)
+            )
 
-                TopMenuIconButton(
-                    icon = Icons.Filled.Comment,
-                    onClick = onComment,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-
-                TopMenuIconButton(
-                    icon = Icons.Filled.BookmarkBorder,
-                    onClick = onAddBookmark
-                )
-            }
+            TopMenuIconButton(
+                icon = Icons.Filled.BookmarkBorder,
+                onClick = onAddBookmark
+            )
         }
     }
 }
@@ -106,20 +100,15 @@ private fun TopMenuIconButton(
                 },
                 shape = RoundedCornerShape(8.dp)
             )
-            .clickable(
-                onClick = {
-                    onClick()
-                    Log.e("TAG", "TopMenuIconButton: click", )
-                },
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            )
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
                         isPressed = true
                         tryAwaitRelease()
                         isPressed = false
+                    },
+                    onTap = {
+                        onClick()
                     }
                 )
             },
@@ -171,7 +160,6 @@ fun ReaderTopMenuDialog(controller: DialogControllerWithAnim){
                 ) {
                     Surface(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .wrapContentHeight(Alignment.Top)
                     ) {
                         ReaderTopMenu(

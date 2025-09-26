@@ -150,17 +150,15 @@ private fun MenuItem(
 
     Column(
         modifier = Modifier
-            .clickable(
-                onClick = onClick,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            )
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
                         isPressed = true
                         tryAwaitRelease()
                         isPressed = false
+                    },
+                    onTap = {
+                        onClick()
                     }
                 )
             },
@@ -211,6 +209,9 @@ fun ReaderBottomMenuDialog(controller: DialogControllerWithAnim){
         ) {
             Box(
                 modifier = Modifier
+                    .clickable {
+                        Log.e("TAG", "ReaderBottomMenuDialog: ", )
+                    }
                     .fillMaxWidth()
                     .wrapContentHeight(Alignment.Bottom) // 内容贴底
             ) {
