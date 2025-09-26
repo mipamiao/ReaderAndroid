@@ -1,28 +1,19 @@
 package com.mipa.readerandroid.view.composedata
 
-import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
-import com.mipa.readerandroid.base.DialogController
+import com.mipa.readerandroid.base.dialogcontroller.DialogController
 import com.mipa.readerandroid.model.dto.UserLoginRequest
 import com.mipa.readerandroid.model.dto.UserRegisterRequest
 import com.mipa.readerandroid.service.UserService
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Optional
 
 class AuthPageCD: BaseCD() {
 

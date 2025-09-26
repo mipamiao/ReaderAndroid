@@ -1,8 +1,11 @@
 package com.mipa.readerandroid.view.reader
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
+import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.service.ChapterService
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +24,10 @@ class ReaderViewCD: BaseCD() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    val menuController = DialogControllerWithAnim()
+
+    val  pages = mutableStateListOf<String>()
 
     fun getData() {
         if (isLoading.value) return
@@ -42,5 +49,42 @@ class ReaderViewCD: BaseCD() {
     fun from(bookId: String?, chapterId: String?){
         this.bookId = bookId
         this.chapterId = chapterId
+    }
+
+    fun addAllToPages(extraPages: List<String>){
+        pages.addAll(extraPages)
+    }
+
+
+    fun onClickFontStyleItem() {
+
+    }
+
+    fun onClickFontSizeItem() {
+
+    }
+
+    fun onClickChapterListItem() {
+
+    }
+
+    fun onClickBookmarkItem() {
+
+    }
+
+    fun onClickBack(naviController: NavHostController){
+        naviController.popBackStack()
+    }
+
+    fun onClickListenBook(){
+
+    }
+
+    fun onClickComment(){
+
+    }
+
+    fun onClickAddBookmark(){
+
     }
 }

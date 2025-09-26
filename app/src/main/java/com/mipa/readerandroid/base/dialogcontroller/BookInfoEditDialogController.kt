@@ -1,4 +1,4 @@
-package com.mipa.readerandroid.base
+package com.mipa.readerandroid.base.dialogcontroller
 
 import com.mipa.readerandroid.model.feature.Book
 

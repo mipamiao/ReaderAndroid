@@ -1,4 +1,4 @@
-package com.mipa.readerandroid.base
+package com.mipa.readerandroid.base.dialogcontroller
 
 import androidx.compose.runtime.mutableStateOf
 
@@ -9,7 +9,7 @@ open class DialogController {
         get() = showState.value
     var callBackSet: MutableSet<DialogCallBack> = mutableSetOf()
 
-    fun show() {
+    open fun show() {
         showState.value = true
     }
 
@@ -19,7 +19,7 @@ open class DialogController {
         }
     }
 
-    fun dismiss() {
+    open fun dismiss() {
         showState.value = false
     }
 
