@@ -25,6 +25,12 @@ interface ChapterNao {
         @Query("chapterId") chapterId: String
     ): ApiResponse<Chapter>
 
+    @GET("${Domain.chapterPublic}/get-by-order")
+    suspend fun getChapterByOrder(
+        @Query("bookId") bookId: String,
+        @Query("order") order: Int
+    ): ApiResponse<Chapter>
+
     @GET("${Domain.chapterPublic}/list")
     suspend fun listChapter(
         @Query("bookId") bookId: String,

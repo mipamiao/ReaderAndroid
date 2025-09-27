@@ -41,19 +41,20 @@ import kotlin.math.min
 fun ReaderScreen() {
     val TAG = "ReaderScreen"
     val viewModel = CDMap.get<ReaderViewCD>()
-    val chapter by viewModel.chapter.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val chapterCache = viewModel.chapterCache
+    val isLoading by chapterCache.isLoading.collectAsState()
 
     val pages = remember { mutableStateOf(emptyList<String>()) }
-    Log.e(TAG, "ReaderScreen: pages-size: ${pages.value.size}", )
+    Log.e(TAG, "ReaderScreen: pages-size: ${pages.value.size}")
 
 
     var rawSize by remember { mutableStateOf<IntSize?>(null) }
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val lineHeight = 30.sp
-    val lineHeightPx = with(density){lineHeight.toPx()}
-    val text = chapter.content
+    val lineHeightPx = with(density) { lineHeight.toPx() }
+    val text = viewModel.content
+    val title = viewModel.title
     val textStyle = TextStyle(
         fontSize = 18.sp,
         fontFamily = FontFamily.Serif,
@@ -65,32 +66,31 @@ fun ReaderScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     // 加载章节数据
-    LaunchedEffect(chapter) {
-        viewModel.getData()
+    LaunchedEffect(viewModel.order.value) {
+        viewModel.loadChapter()
     }
-    LaunchedEffect(rawSize, chapter) {
+
+    LaunchedEffect(rawSize, text.value) {
         delay(100) // 等待100ms，避免频繁更新
-        Log.e(TAG,"稳定尺寸: ${rawSize?:"null"}")
+        Log.e(TAG, "稳定尺寸: ${rawSize ?: "null"}")
         pages.value = rawSize?.let { rawSize ->
             val constraints = Constraints(
                 maxWidth = rawSize.width, // 最大宽度（像素）
                 maxHeight = Int.MAX_VALUE
             )
-            text?.let {
-                sliceText(
-                    it,
-                    textMeasurer.measure(
-                        text = AnnotatedString(it),
-                        style = textStyle,
-                        constraints = constraints
-                    ),
-                    rawSize.height,
-                    (lineHeightPx + 0.5f).toInt()
-                )
-            }
+            sliceText(
+                text.value,
+                textMeasurer.measure(
+                    text = AnnotatedString(text.value),
+                    style = textStyle,
+                    constraints = constraints
+                ),
+                rawSize.height,
+                (lineHeightPx + 0.5f).toInt()
+            )
         } ?: emptyList()
+        Log.e(TAG, "LaunchedEffect: pages-size: ${pages.value.size}")
     }
-
 
 
     ReaderBottomMenuDialog(viewModel.menuController)
@@ -101,7 +101,7 @@ fun ReaderScreen() {
     Column(modifier = Modifier
         .fillMaxSize()) {
         Text(
-            text = chapter.chapterInfo?.title ?: "",
+            text = title.value,
             style = TextStyle(
                 fontSize = 20.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
@@ -124,13 +124,9 @@ fun ReaderScreen() {
                         onTap = { offset ->
                             val screenWidth = size.width
                             if (offset.x < screenWidth / 3) {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
-                                }
+                                viewModel.lastPage(pagerState, coroutineScope)
                             } else if (offset.x > screenWidth * 2 / 3) {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(max(pagerState.currentPage + 1, 0))
-                                }
+                                viewModel.nextPage(pagerState, coroutineScope)
                             } else {
                                 viewModel.switchMenu()
                             }
@@ -138,13 +134,13 @@ fun ReaderScreen() {
                     )
                 }
         ) {
-            HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    if (false) {
-                        LoadingCompose()
-                    } else {
+            if(isLoading){
+                LoadingCompose()
+            }else {
+                HorizontalPager(state = pagerState, userScrollEnabled = false) { page ->
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
                         Text(
                             text = pages.value[page],
                             style = textStyle,
@@ -153,6 +149,7 @@ fun ReaderScreen() {
                     }
                 }
             }
+
         }
 
     }

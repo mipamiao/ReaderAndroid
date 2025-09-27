@@ -37,6 +37,21 @@ object ChapterService {
         return null
     }
 
+    suspend fun getChapterByOrder(bookId: String, order: Int): Chapter? {
+        try {
+            val res = chapterNao.getChapterByOrder(bookId, order)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return it
+                }
+            }
+        }catch (e: Throwable){
+            e.printStackTrace()
+            return null
+        }
+        return null
+    }
+
     suspend fun listChapters(bookId: String, pageNumber: Int, pageSize: Int):  Pair<List<ChapterInfo>, Int> {
         val res = chapterNao.listChapter(bookId, pageNumber, pageSize)
         if(res.isSuccess()){

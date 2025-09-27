@@ -2,79 +2,116 @@ package com.mipa.readerandroid.view.reader
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
+import com.mipa.readerandroid.base.EffectController.EffectController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
-import com.mipa.readerandroid.model.feature.Chapter
-import com.mipa.readerandroid.service.ChapterService
-import kotlinx.coroutines.Dispatchers
+import com.mipa.readerandroid.view.composedata.base.ChapterCache
+import com.mipa.readerandroid.view.composedata.base.ChaptersCache
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.max
-import kotlin.math.min
 
 class ReaderViewCD: BaseCD() {
 
     var bookId: String? = null
     var chapterId: String? = null
+    var orderNum: Int? = null
 
-    private val _chapter = MutableStateFlow(Chapter(null, null))
-    val chapter: StateFlow<Chapter> = _chapter
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     val menuController = DialogControllerWithAnim()
 
-    val  pages = mutableStateListOf<String>()
 
-    fun getData() {
-        if (isLoading.value) return
-        _isLoading.value = true
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                ConstValue.delay()
-                bookId?.let { bookId ->
-                    chapterId?.let { chapterId ->
-                        val res = ChapterService.getChapter(bookId, chapterId)
-                        res?.let { _chapter.value = it }
-                    }
-                }
-            }
-            _isLoading.value = false
-        }
-    }
+    val chaptersCache = ChaptersCache()
+    var chapterCache = ChapterCache()
+
+    private val _order  = mutableStateOf(0)
+    val order: State<Int> = _order
+
+    private val _content = mutableStateOf("")
+    val content: State<String> = _content
+
+    private val _title = mutableStateOf("")
+    val title: State<String> = _title
+
+    val loadChapterTrigger = EffectController()
+
 
     fun from(bookId: String?, chapterId: String?){
         this.bookId = bookId
         this.chapterId = chapterId
     }
 
-    fun addAllToPages(extraPages: List<String>){
-        pages.addAll(extraPages)
+    fun from(bookId: String, order: Int, orderNum: Int) {
+        this.bookId = bookId
+        this._order.value = order
+        this.orderNum = orderNum
+        chaptersCache.orderNum = orderNum
+        chaptersCache.bookId = bookId
     }
 
+
     @OptIn(ExperimentalFoundationApi::class)
-    fun lastPage(pagerState: PagerState) {
+    fun lastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
         if (menuController.dismiss()) return
-        viewModelScope.launch {
-            pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
+        //var target  =
+         {
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
+            }
         }
 
     }
 
     @OptIn(ExperimentalFoundationApi::class)
-    fun nextPage(pagerState: PagerState) {
+    fun nextPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
         if (menuController.dismiss()) return
-        viewModelScope.launch {
-            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+        val target = if (pagerState.settledPage == pagerState.pageCount - 1) {
+            nextChapter()
+            0
+        } else {
+            pagerState.settledPage + 1
         }
+        coroutineScope.launch {
+            pagerState.scrollToPage(target)
+        }
+    }
+
+    fun lastChapter() {
+        if (order.value == 0) {
+            ConstValue.showToast("没有上一章啦")
+            return
+        }
+        _order.value--
+    }
+
+    fun nextChapter() {
+        if (order.value == orderNum!! - 1) {
+            ConstValue.showToast("没有下一章啦")
+            return
+        }
+        _order.value ++
+    }
+
+    fun loadChapter() {
+        chapterCache = chaptersCache.get(order.value, onEnd = { chapter ->
+            chapter?.let { chapter
+                chapter.content?.let {
+                    _content.value = it
+                }
+                chapter.chapterInfo?.title?.let {
+                    _title.value = it
+                }
+            }
+        })
     }
 
 
