@@ -20,6 +20,7 @@ class ChaptersCache {
     var rightCacheNumber = 2
 
     var chapterList = mutableListOf<ChapterCache>()
+    var lastGetOrder = 0
 
     init {
         for (i in 1..leftCacheNumber+rightCacheNumber+1)
@@ -44,8 +45,13 @@ class ChaptersCache {
                 tempList.add(it)
             }
         }
-        tempList.addAll(chapterList)
-        chapterList = tempList
+        if (order > lastGetOrder) {
+            tempList.addAll(chapterList)
+            chapterList = tempList
+        } else {
+            chapterList.addAll(tempList)
+        }
+
         for (index in 0..(leftCacheNumber + rightCacheNumber)) {
             if (index + newStartOrder>=0&&index + newStartOrder < orderNum!!) {
                 chapterList[index].targetOrder = index + newStartOrder
@@ -58,6 +64,7 @@ class ChaptersCache {
         }
         logList()
 
+        lastGetOrder = order
         return chapterList[leftCacheNumber]
     } //todo 快速滑动，前一组还没加载完就下一组
 

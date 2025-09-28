@@ -1,14 +1,14 @@
 package com.mipa.readerandroid.view.reader
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,14 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.base.CDMap
@@ -31,11 +26,8 @@ import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.compose.dialog.ReaderBottomMenuDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderTopMenuDialog
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.math.max
-import kotlin.math.min
 
+@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ReaderScreen() {
@@ -44,59 +36,36 @@ fun ReaderScreen() {
     val chapterCache = viewModel.chapterCache
     val isLoading by chapterCache.isLoading.collectAsState()
 
-    val pages = remember { mutableStateOf(emptyList<String>()) }
+    val pages = viewModel.pages
     Log.e(TAG, "ReaderScreen: pages-size: ${pages.value.size}")
 
+    viewModel.textMeasure = rememberTextMeasurer()
+    viewModel.density = LocalDensity.current
 
-    var rawSize by remember { mutableStateOf<IntSize?>(null) }
-    val textMeasurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val lineHeight = 30.sp
-    val lineHeightPx = with(density) { lineHeight.toPx() }
-    val text = viewModel.content
     val title = viewModel.title
-    val textStyle = TextStyle(
-        fontSize = 18.sp,
-        fontFamily = FontFamily.Serif,
-        lineHeight = lineHeight,
-        letterSpacing = 0.5.sp
-    )
+
 
     val naviController = LocalNavController.current
     val coroutineScope = rememberCoroutineScope()
 
     // 加载章节数据
-    LaunchedEffect(viewModel.order.value) {
+    LaunchedEffect(Unit) {
         viewModel.loadChapter()
     }
 
-    LaunchedEffect(rawSize, text.value) {
-        delay(100) // 等待100ms，避免频繁更新
-        Log.e(TAG, "稳定尺寸: ${rawSize ?: "null"}")
-        pages.value = rawSize?.let { rawSize ->
-            val constraints = Constraints(
-                maxWidth = rawSize.width, // 最大宽度（像素）
-                maxHeight = Int.MAX_VALUE
-            )
-            sliceText(
-                text.value,
-                textMeasurer.measure(
-                    text = AnnotatedString(text.value),
-                    style = textStyle,
-                    constraints = constraints
-                ),
-                rawSize.height,
-                (lineHeightPx + 0.5f).toInt()
-            )
-        } ?: emptyList()
-        Log.e(TAG, "LaunchedEffect: pages-size: ${pages.value.size}")
-    }
+//    LaunchedEffect(viewModel.readerSize.value, text.value) {
+//        delay(100) // 等待100ms，避免频繁更新
+//        Log.e(TAG, "稳定尺寸: ${rawSize ?: "null"}")
+//    }
 
 
     ReaderBottomMenuDialog(viewModel.menuController)
     ReaderTopMenuDialog(viewModel.menuController)
 
-    val pagerState = rememberPagerState(pageCount = {pages.value.size}) // 总页数
+    val pagerState = rememberPagerState(pageCount = {pages.value.size}, initialPage = viewModel.initialPageIndex) // 总页数
+    LaunchedEffect(pages.value) {
+        pagerState.scrollToPage(viewModel.initialPageIndex)
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()) {
@@ -117,7 +86,7 @@ fun ReaderScreen() {
                 .padding(horizontal = 8.dp)
                 .onSizeChanged { size ->
                     Log.e(TAG, "变化尺寸: $size")
-                    rawSize = size
+                    viewModel.readerSize.value = size
                 }
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -143,7 +112,7 @@ fun ReaderScreen() {
                     ) {
                         Text(
                             text = pages.value[page],
-                            style = textStyle,
+                            style = viewModel.textStyle,
                             modifier = Modifier
                         )
                     }
@@ -153,21 +122,5 @@ fun ReaderScreen() {
         }
 
     }
-}
 
-fun sliceText(text: String, textLayoutResult: TextLayoutResult, maxHeight: Int, lineHeightPx: Int): List<String> {
-    val maxLineCount =  maxHeight/lineHeightPx
-    var startLine = 0
-    val texts: MutableList<String> = mutableListOf()
-    while (startLine < textLayoutResult.lineCount) {
-        val endLine = min(startLine + maxLineCount, textLayoutResult.lineCount)
-        texts.add(
-            text.substring(
-                textLayoutResult.getLineStart(startLine),
-                textLayoutResult.getLineEnd(endLine - 1)
-            )
-        )
-        startLine = endLine
-    }
-    return texts
 }

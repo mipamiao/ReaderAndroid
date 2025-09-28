@@ -1,9 +1,20 @@
 package com.mipa.readerandroid.view.reader
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.ConstValue
@@ -16,8 +27,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.max
+import kotlin.math.min
 
 class ReaderViewCD: BaseCD() {
+
+    companion object{
+        const val TAG = "ReaderViewCD"
+    }
 
     var bookId: String? = null
     var chapterId: String? = null
@@ -43,6 +59,22 @@ class ReaderViewCD: BaseCD() {
     val title: State<String> = _title
 
     val loadChapterTrigger = EffectController()
+    var textMeasure: TextMeasurer? = null
+    var density: Density? = null
+
+    val readerSize =  mutableStateOf(IntSize(0,0))
+
+    val pages = mutableStateOf(emptyList<String>())
+
+    var initialPageIndex = 0
+
+    val lineHeight = 30.sp
+    val textStyle = TextStyle(
+        fontSize = 18.sp,
+        fontFamily = FontFamily.Serif,
+        lineHeight = lineHeight,
+        letterSpacing = 0.5.sp
+    )
 
 
     fun from(bookId: String?, chapterId: String?){
@@ -62,56 +94,90 @@ class ReaderViewCD: BaseCD() {
     @OptIn(ExperimentalFoundationApi::class)
     fun lastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
         if (menuController.dismiss()) return
-        //var target  =
-         {
+        if(pagerState.settledPage == 0){
+            if(lastChapter())
+                initialPageIndex = pages.value.size - 1
+        }else {
             coroutineScope.launch {
-                pagerState.animateScrollToPage(max(pagerState.currentPage - 1, 0))
+                pagerState.animateScrollToPage(pagerState.settledPage - 1)
             }
         }
-
     }
 
     @OptIn(ExperimentalFoundationApi::class)
     fun nextPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
         if (menuController.dismiss()) return
-        val target = if (pagerState.settledPage == pagerState.pageCount - 1) {
-            nextChapter()
-            0
+        if (pagerState.settledPage == pagerState.pageCount - 1) {
+            if(nextChapter())
+                initialPageIndex = 0
         } else {
-            pagerState.settledPage + 1
-        }
-        coroutineScope.launch {
-            pagerState.scrollToPage(target)
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.settledPage + 1)
+            }
         }
     }
 
-    fun lastChapter() {
+    fun lastChapter(): Boolean {
         if (order.value == 0) {
             ConstValue.showToast("没有上一章啦")
-            return
+            return false
         }
         _order.value--
+        loadChapter(-1)
+        return true
     }
 
-    fun nextChapter() {
+    fun nextChapter(): Boolean {
         if (order.value == orderNum!! - 1) {
             ConstValue.showToast("没有下一章啦")
-            return
+            return false
         }
         _order.value ++
+        loadChapter(1)
+        return true
     }
 
-    fun loadChapter() {
+    fun loadChapter(isNextOrLast: Int = 0) {
         chapterCache = chaptersCache.get(order.value, onEnd = { chapter ->
             chapter?.let { chapter
                 chapter.content?.let {
                     _content.value = it
+                    sliceContent()
+                    when (isNextOrLast) {
+                        1 -> initialPageIndex = 0
+                        -1 -> initialPageIndex = pages.value.size - 1
+                        else -> initialPageIndex = 0
+                    }
                 }
                 chapter.chapterInfo?.title?.let {
                     _title.value = it
                 }
+
             }
         })
+    }
+
+    fun sliceContent(){
+        val lineHeightPx = density?.let { with(it){lineHeight.toPx()} }?:0f
+        val constraints = Constraints(
+            maxWidth = readerSize.value.width, // 最大宽度（像素）
+            maxHeight = Int.MAX_VALUE
+        )
+        val res = textMeasure?.measure(
+            text = AnnotatedString(content.value),
+            style = textStyle,
+            constraints = constraints
+        )?.let {
+            sliceText(
+                content.value,
+                it,
+                readerSize.value.height,
+                (lineHeightPx + 0.5f).toInt()
+            )
+        }
+        res?.let { pages.value = res }
+        Log.e(TAG, "sliceContent: pages-size: ${pages.value.size}")
+        //Log.e(TAG, "sliceContent: pagerState: ${pages.value.size}")
     }
 
 
@@ -151,4 +217,22 @@ class ReaderViewCD: BaseCD() {
     fun onClickAddBookmark(){
 
     }
+}
+
+
+fun sliceText(text: String, textLayoutResult: TextLayoutResult, maxHeight: Int, lineHeightPx: Int): List<String> {
+    val maxLineCount =  maxHeight/lineHeightPx
+    var startLine = 0
+    val texts: MutableList<String> = mutableListOf()
+    while (startLine < textLayoutResult.lineCount) {
+        val endLine = min(startLine + maxLineCount, textLayoutResult.lineCount)
+        texts.add(
+            text.substring(
+                textLayoutResult.getLineStart(startLine),
+                textLayoutResult.getLineEnd(endLine - 1)
+            )
+        )
+        startLine = endLine
+    }
+    return texts
 }
