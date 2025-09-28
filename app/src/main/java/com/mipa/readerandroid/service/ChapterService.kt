@@ -23,11 +23,31 @@ object ChapterService {
     }
 
     suspend fun getChapter(bookId: String, chapterId: String): Chapter? {
-        val res = chapterNao.getChapter(bookId, chapterId)
-        if (res.isSuccess()) {
-            res.data?.let {
-                return it
+        try {
+            val res = chapterNao.getChapter(bookId, chapterId)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return it
+                }
             }
+        }catch (e: Throwable){
+            e.printStackTrace()
+            return null
+        }
+        return null
+    }
+
+    suspend fun getChapterByOrder(bookId: String, order: Int): Chapter? {
+        try {
+            val res = chapterNao.getChapterByOrder(bookId, order)
+            if (res.isSuccess()) {
+                res.data?.let {
+                    return it
+                }
+            }
+        }catch (e: Throwable){
+            e.printStackTrace()
+            return null
         }
         return null
     }

@@ -1,20 +1,12 @@
 package com.mipa.readerandroid.view.composedata
 
-import android.widget.Toast
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import com.mipa.readerandroid.R
-import com.mipa.readerandroid.base.BookInfoEditDialogController
+import com.mipa.readerandroid.base.dialogcontroller.BookInfoEditDialogController
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
-import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.service.BookService
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

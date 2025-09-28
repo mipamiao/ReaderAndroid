@@ -18,8 +18,19 @@ class BookShelfPageCD : DatasShowViewModel<Library>() {
     }
 
     override fun onItemClick(data: Library, naviController: NavHostController) {
-        CDMap.get<ReaderViewCD>().from(data.book?.bookId, data.chapterInfo?.chapterId)
-        naviController.navigate(ConstValue.ROUTER_READER_PAGE)
+        data.book?.let { book ->
+            book.bookId?.let {
+                data.chapterInfo?.order?.let { it1 ->
+                    book.chaptersCount?.let { it2 ->
+                        CDMap.get<ReaderViewCD>().from(
+                            it, it1, it2
+                        )
+                    }
+                }
+            }
+            naviController.navigate(ConstValue.ROUTER_READER_PAGE)
+        }
+
     }
 
     fun onDeleteClick(data: Library) {

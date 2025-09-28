@@ -45,7 +45,11 @@ class ChapterListPageCD : ChaptersShowViewModel() {
     }
 
     override fun onItemClick(data: ChapterInfo, naviController: NavHostController) {
-        CDMap.get<ReaderViewCD>().from(book.value.bookId, data.chapterId)
+        chapterNum?.let {
+            book.value.bookId?.let { it1 ->
+                data.order?.let { it2 -> CDMap.get<ReaderViewCD>().from(it1, it2, it) }
+            }
+        }
         addLibrary(data)
         naviController.navigate(ConstValue.ROUTER_READER_PAGE) {
             launchSingleTop = true

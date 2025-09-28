@@ -16,6 +16,8 @@ import com.mipa.readerandroid.service.UserService
 import com.mipa.readerandroid.ui.theme.ReaderAndroidTheme
 import com.mipa.readerandroid.view.compose.MainNavigation
 import com.mipa.readerandroid.view.composedata.MePageCD
+import com.mipa.readerandroid.view.reader.ReaderScreen
+import com.mipa.readerandroid.view.reader.ReaderViewCD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,6 +29,9 @@ class MainActivity :AbsActivity() {
         enableEdgeToEdge()
         setContent {
             ReaderAndroidTheme {
+//                CDMap.get<ReaderViewCD>().from(bookId = "150e726f-e363-48cd-ba03-682d0041c9a4", chapterId = "09808539-e32f-4ea9-adff-c5b450f2247c")
+//                ReaderScreen()
+                //TestScreen()
                 MainNavigation()
             }
         }
