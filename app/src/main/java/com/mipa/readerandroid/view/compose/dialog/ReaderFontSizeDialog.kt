@@ -84,7 +84,7 @@ fun ReaderFontSize(
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             )
             .clickable(onClick = {}),
         contentAlignment = Alignment.BottomCenter
