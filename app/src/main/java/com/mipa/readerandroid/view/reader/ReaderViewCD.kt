@@ -23,6 +23,7 @@ import com.mipa.readerandroid.base.EffectController.EffectController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.ChapterInfo
+import com.mipa.readerandroid.service.CustomedSettingService
 import com.mipa.readerandroid.view.composedata.ChaptersShowViewModel
 import com.mipa.readerandroid.view.composedata.base.ChapterCache
 import com.mipa.readerandroid.view.composedata.base.ChaptersCache
@@ -30,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,6 +52,7 @@ class ReaderViewCD: BaseCD() {
 
     val menuController = DialogControllerWithAnim()
     val dirController = DialogControllerWithAnim()
+    val fontSizeController = DialogControllerWithAnim()
 
 
     val chaptersCache = ChaptersCache()
@@ -75,13 +78,19 @@ class ReaderViewCD: BaseCD() {
 
     var initialPageIndex = 0
 
-    val lineHeight = 30.sp
-    val textStyle = TextStyle(
+    val lineHeight = 28.sp
+    val fontSize = 18
+    val _textStyle = mutableStateOf(TextStyle(
         fontSize = 18.sp,
         fontFamily = FontFamily.Serif,
         lineHeight = lineHeight,
         letterSpacing = 0.5.sp
-    )
+    ))
+    val textStyle: State<TextStyle>  = _textStyle
+
+    init {
+        loadReaderSetting()
+    }
 
 
     fun from(bookId: String?, chapterId: String?){
@@ -155,7 +164,7 @@ class ReaderViewCD: BaseCD() {
                     when (isNextOrLast) {
                         1 -> initialPageIndex = 0
                         -1 -> initialPageIndex = pages.value.size - 1
-                        else -> initialPageIndex = 0
+                        else -> initialPageIndex = -1
                     }
                 }
                 chapter.chapterInfo?.title?.let {
@@ -166,15 +175,20 @@ class ReaderViewCD: BaseCD() {
         })
     }
 
+    fun flushPages(){
+        sliceContent()
+        initialPageIndex = -1
+    }
+
     fun sliceContent(){
-        val lineHeightPx = density?.let { with(it){lineHeight.toPx()} }?:0f
+        val lineHeightPx = density?.let { with(it){textStyle.value.lineHeight.toPx()} }?:0f
         val constraints = Constraints(
             maxWidth = readerSize.value.width, // 最大宽度（像素）
             maxHeight = Int.MAX_VALUE
         )
         val res = textMeasure?.measure(
             text = AnnotatedString(content.value),
-            style = textStyle,
+            style = textStyle.value,
             constraints = constraints
         )?.let {
             sliceText(
@@ -190,11 +204,6 @@ class ReaderViewCD: BaseCD() {
     }
 
 
-    fun switchMenu(){
-
-        menuController.switch()
-    }
-
     fun openMenu(){
         if(clearAllDialog())return
         menuController.show()
@@ -206,7 +215,8 @@ class ReaderViewCD: BaseCD() {
     }
 
     fun onClickFontSizeItem() {
-
+        clearAllDialog()
+        fontSizeController.show()
     }
 
     fun onClickChapterListItem() {
@@ -249,7 +259,33 @@ class ReaderViewCD: BaseCD() {
 
     fun clearAllDialog(): Boolean {
         return menuController.dismiss() ||
-                dirController.dismiss()
+                dirController.dismiss()||
+                fontSizeController.dismiss()
+    }
+
+    fun setTextStyle(style: TextStyle) {
+        _textStyle.value = style
+        //可以加个变化检测
+        saveReaderSetting()
+        flushPages()
+    }
+
+    fun loadReaderSetting() {
+        loadTextStyle()
+    }
+
+    fun loadTextStyle() {
+        val fontSize = CustomedSettingService.readerFontSize.get()
+        _textStyle.value = TextStyle(
+            fontSize = fontSize.sp,
+            fontFamily = FontFamily.Serif,
+            lineHeight = (fontSize + 10).sp,
+            letterSpacing = 0.5.sp
+        )
+    }
+
+    fun saveReaderSetting() {
+        CustomedSettingService.readerFontSize.set(textStyle.value.fontSize.value.toInt())
     }
 }
 

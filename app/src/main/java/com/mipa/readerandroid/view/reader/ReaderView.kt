@@ -26,6 +26,8 @@ import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.compose.dialog.ReaderBottomMenuDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderDirDialog
+import com.mipa.readerandroid.view.compose.dialog.ReaderFontSize
+import com.mipa.readerandroid.view.compose.dialog.ReaderFontSizeDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderTopMenuDialog
 
 @SuppressLint("RememberReturnType")
@@ -63,10 +65,11 @@ fun ReaderScreen() {
     ReaderBottomMenuDialog(viewModel.menuController)
     ReaderTopMenuDialog(viewModel.menuController)
     ReaderDirDialog(viewModel.dirController)
+    ReaderFontSizeDialog(viewModel.fontSizeController)
 
-    val pagerState = rememberPagerState(pageCount = {pages.value.size}, initialPage = viewModel.initialPageIndex) // 总页数
+    val pagerState = rememberPagerState(pageCount = {pages.value.size}) // 总页数
     LaunchedEffect(pages.value) {
-        pagerState.scrollToPage(viewModel.initialPageIndex)
+        if (viewModel.initialPageIndex >= 0) pagerState.scrollToPage(viewModel.initialPageIndex)
     }
 
     Column(modifier = Modifier
@@ -114,15 +117,12 @@ fun ReaderScreen() {
                     ) {
                         Text(
                             text = pages.value[page],
-                            style = viewModel.textStyle,
+                            style = viewModel.textStyle.value,
                             modifier = Modifier
                         )
                     }
                 }
             }
-
         }
-
     }
-
 }

@@ -1,6 +1,6 @@
 package com.mipa.readerandroid.model.feature
 
-import java.time.LocalDateTime
+
 
 class UserProfile {
      var userId: String? = null
