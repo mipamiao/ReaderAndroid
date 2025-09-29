@@ -23,6 +23,7 @@ import com.mipa.readerandroid.base.EffectController.EffectController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.model.feature.Book
 import com.mipa.readerandroid.model.feature.ChapterInfo
+import com.mipa.readerandroid.service.CustomedSettingService
 import com.mipa.readerandroid.view.composedata.ChaptersShowViewModel
 import com.mipa.readerandroid.view.composedata.base.ChapterCache
 import com.mipa.readerandroid.view.composedata.base.ChaptersCache
@@ -86,6 +87,10 @@ class ReaderViewCD: BaseCD() {
         letterSpacing = 0.5.sp
     ))
     val textStyle: State<TextStyle>  = _textStyle
+
+    init {
+        loadReaderSetting()
+    }
 
 
     fun from(bookId: String?, chapterId: String?){
@@ -258,10 +263,29 @@ class ReaderViewCD: BaseCD() {
                 fontSizeController.dismiss()
     }
 
-    fun setTextStyle(style: TextStyle){
+    fun setTextStyle(style: TextStyle) {
         _textStyle.value = style
         //可以加个变化检测
+        saveReaderSetting()
         flushPages()
+    }
+
+    fun loadReaderSetting() {
+        loadTextStyle()
+    }
+
+    fun loadTextStyle() {
+        val fontSize = CustomedSettingService.readerFontSize.get()
+        _textStyle.value = TextStyle(
+            fontSize = fontSize.sp,
+            fontFamily = FontFamily.Serif,
+            lineHeight = (fontSize + 10).sp,
+            letterSpacing = 0.5.sp
+        )
+    }
+
+    fun saveReaderSetting() {
+        CustomedSettingService.readerFontSize.set(textStyle.value.fontSize.value.toInt())
     }
 }
 
