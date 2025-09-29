@@ -25,6 +25,7 @@ import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
 import com.mipa.readerandroid.view.compose.dialog.ReaderBottomMenuDialog
+import com.mipa.readerandroid.view.compose.dialog.ReaderDirDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderTopMenuDialog
 
 @SuppressLint("RememberReturnType")
@@ -61,6 +62,7 @@ fun ReaderScreen() {
 
     ReaderBottomMenuDialog(viewModel.menuController)
     ReaderTopMenuDialog(viewModel.menuController)
+    ReaderDirDialog(viewModel.dirController)
 
     val pagerState = rememberPagerState(pageCount = {pages.value.size}, initialPage = viewModel.initialPageIndex) // 总页数
     LaunchedEffect(pages.value) {
@@ -97,7 +99,7 @@ fun ReaderScreen() {
                             } else if (offset.x > screenWidth * 2 / 3) {
                                 viewModel.nextPage(pagerState, coroutineScope)
                             } else {
-                                viewModel.switchMenu()
+                                viewModel.openMenu()
                             }
                         }
                     )

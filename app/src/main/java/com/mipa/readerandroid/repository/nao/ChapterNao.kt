@@ -38,6 +38,11 @@ interface ChapterNao {
         @Query("pageSize") pageSize: Int,
     ): ApiResponse<ChapterListDTO>
 
+    @GET("${Domain.chapterPublic}/list-all")
+    suspend fun listAllChapter(
+        @Query("bookId") bookId: String,
+    ): ApiResponse<List<ChapterInfo>>
+
     @POST("${Domain.chapterPrivate}/add")
     suspend fun addChapter(
         @Header("Authorization") token: String,

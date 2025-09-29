@@ -17,9 +17,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
+import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.base.EffectController.EffectController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
+import com.mipa.readerandroid.model.feature.Book
+import com.mipa.readerandroid.model.feature.ChapterInfo
+import com.mipa.readerandroid.view.composedata.ChaptersShowViewModel
 import com.mipa.readerandroid.view.composedata.base.ChapterCache
 import com.mipa.readerandroid.view.composedata.base.ChaptersCache
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +39,7 @@ class ReaderViewCD: BaseCD() {
         const val TAG = "ReaderViewCD"
     }
 
+    var book: Book? = null
     var bookId: String? = null
     var chapterId: String? = null
     var orderNum: Int? = null
@@ -44,6 +49,7 @@ class ReaderViewCD: BaseCD() {
     val isLoading: StateFlow<Boolean> = _isLoading
 
     val menuController = DialogControllerWithAnim()
+    val dirController = DialogControllerWithAnim()
 
 
     val chaptersCache = ChaptersCache()
@@ -58,13 +64,14 @@ class ReaderViewCD: BaseCD() {
     private val _title = mutableStateOf("")
     val title: State<String> = _title
 
+    val readerSize =  mutableStateOf(IntSize(0,0))
+    val pages = mutableStateOf(emptyList<String>())
+    val dirPopupCD = CDMap.get<DirPopupCD>()
+
+
     val loadChapterTrigger = EffectController()
     var textMeasure: TextMeasurer? = null
     var density: Density? = null
-
-    val readerSize =  mutableStateOf(IntSize(0,0))
-
-    val pages = mutableStateOf(emptyList<String>())
 
     var initialPageIndex = 0
 
@@ -82,10 +89,12 @@ class ReaderViewCD: BaseCD() {
         this.chapterId = chapterId
     }
 
-    fun from(bookId: String, order: Int, orderNum: Int) {
+    fun from(book: Book, bookId: String, order: Int, orderNum: Int) {
+        this.book = book
         this.bookId = bookId
         this._order.value = order
         this.orderNum = orderNum
+
         chaptersCache.orderNum = orderNum
         chaptersCache.bookId = bookId
     }
@@ -93,7 +102,7 @@ class ReaderViewCD: BaseCD() {
 
     @OptIn(ExperimentalFoundationApi::class)
     fun lastPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
-        if (menuController.dismiss()) return
+        if(clearAllDialog())return
         if(pagerState.settledPage == 0){
             if(lastChapter())
                 initialPageIndex = pages.value.size - 1
@@ -106,7 +115,7 @@ class ReaderViewCD: BaseCD() {
 
     @OptIn(ExperimentalFoundationApi::class)
     fun nextPage(pagerState: PagerState, coroutineScope: CoroutineScope) {
-        if (menuController.dismiss()) return
+        if(clearAllDialog())return
         if (pagerState.settledPage == pagerState.pageCount - 1) {
             if(nextChapter())
                 initialPageIndex = 0
@@ -182,7 +191,13 @@ class ReaderViewCD: BaseCD() {
 
 
     fun switchMenu(){
+
         menuController.switch()
+    }
+
+    fun openMenu(){
+        if(clearAllDialog())return
+        menuController.show()
     }
 
 
@@ -195,7 +210,13 @@ class ReaderViewCD: BaseCD() {
     }
 
     fun onClickChapterListItem() {
-
+        menuController.dismiss()
+        book?.let {
+            dirPopupCD.from(it, order.value) { info ->
+                onClickDirItem(info)
+            }
+        }
+        dirController.show()
     }
 
     fun onClickBookmarkItem() {
@@ -216,6 +237,19 @@ class ReaderViewCD: BaseCD() {
 
     fun onClickAddBookmark(){
 
+    }
+
+    fun onClickDirItem(chapterInfo: ChapterInfo){
+        clearAllDialog()
+        chapterInfo.order?.let {
+            _order.value = it
+            loadChapter(1)
+        }
+    }
+
+    fun clearAllDialog(): Boolean {
+        return menuController.dismiss() ||
+                dirController.dismiss()
     }
 }
 
