@@ -30,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,6 +51,7 @@ class ReaderViewCD: BaseCD() {
 
     val menuController = DialogControllerWithAnim()
     val dirController = DialogControllerWithAnim()
+    val fontSizeController = DialogControllerWithAnim()
 
 
     val chaptersCache = ChaptersCache()
@@ -76,12 +78,14 @@ class ReaderViewCD: BaseCD() {
     var initialPageIndex = 0
 
     val lineHeight = 30.sp
-    val textStyle = TextStyle(
+    val fontSize = 18
+    val _textStyle = mutableStateOf(TextStyle(
         fontSize = 18.sp,
         fontFamily = FontFamily.Serif,
         lineHeight = lineHeight,
         letterSpacing = 0.5.sp
-    )
+    ))
+    val textStyle: State<TextStyle>  = _textStyle
 
 
     fun from(bookId: String?, chapterId: String?){
@@ -155,7 +159,7 @@ class ReaderViewCD: BaseCD() {
                     when (isNextOrLast) {
                         1 -> initialPageIndex = 0
                         -1 -> initialPageIndex = pages.value.size - 1
-                        else -> initialPageIndex = 0
+                        else -> initialPageIndex = -1
                     }
                 }
                 chapter.chapterInfo?.title?.let {
@@ -166,6 +170,10 @@ class ReaderViewCD: BaseCD() {
         })
     }
 
+    fun flushPages(){
+        loadChapter(0)
+    }
+
     fun sliceContent(){
         val lineHeightPx = density?.let { with(it){lineHeight.toPx()} }?:0f
         val constraints = Constraints(
@@ -174,7 +182,7 @@ class ReaderViewCD: BaseCD() {
         )
         val res = textMeasure?.measure(
             text = AnnotatedString(content.value),
-            style = textStyle,
+            style = textStyle.value,
             constraints = constraints
         )?.let {
             sliceText(
@@ -190,11 +198,6 @@ class ReaderViewCD: BaseCD() {
     }
 
 
-    fun switchMenu(){
-
-        menuController.switch()
-    }
-
     fun openMenu(){
         if(clearAllDialog())return
         menuController.show()
@@ -206,7 +209,8 @@ class ReaderViewCD: BaseCD() {
     }
 
     fun onClickFontSizeItem() {
-
+        clearAllDialog()
+        fontSizeController.show()
     }
 
     fun onClickChapterListItem() {
@@ -249,7 +253,14 @@ class ReaderViewCD: BaseCD() {
 
     fun clearAllDialog(): Boolean {
         return menuController.dismiss() ||
-                dirController.dismiss()
+                dirController.dismiss()||
+                fontSizeController.dismiss()
+    }
+
+    fun setTextStyle(style: TextStyle){
+        _textStyle.value = style
+        //可以加个变化检测
+        flushPages()
     }
 }
 
