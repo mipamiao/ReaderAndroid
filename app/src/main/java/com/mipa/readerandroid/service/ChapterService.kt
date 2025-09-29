@@ -62,6 +62,16 @@ object ChapterService {
         return emptyList<ChapterInfo>() to 0
     }
 
+    suspend fun listAllChapters(bookId: String): List<ChapterInfo> {
+        val res = chapterNao.listAllChapter(bookId)
+        if(res.isSuccess()){
+            res.data?.let {
+                return it
+            }
+        }
+        return emptyList()
+    }
+
     suspend fun addChapter(chapterDto: ChapterDto): ChapterInfo?{
         val res = chapterNao.addChapter(TokenMgr.getTokenWithPrefix(), chapterDto)
         if(res.isSuccess()){
