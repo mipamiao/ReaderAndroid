@@ -77,7 +77,7 @@ class ReaderViewCD: BaseCD() {
 
     var initialPageIndex = 0
 
-    val lineHeight = 30.sp
+    val lineHeight = 28.sp
     val fontSize = 18
     val _textStyle = mutableStateOf(TextStyle(
         fontSize = 18.sp,
@@ -171,11 +171,12 @@ class ReaderViewCD: BaseCD() {
     }
 
     fun flushPages(){
-        loadChapter(0)
+        sliceContent()
+        initialPageIndex = -1
     }
 
     fun sliceContent(){
-        val lineHeightPx = density?.let { with(it){lineHeight.toPx()} }?:0f
+        val lineHeightPx = density?.let { with(it){textStyle.value.lineHeight.toPx()} }?:0f
         val constraints = Constraints(
             maxWidth = readerSize.value.width, // 最大宽度（像素）
             maxHeight = Int.MAX_VALUE

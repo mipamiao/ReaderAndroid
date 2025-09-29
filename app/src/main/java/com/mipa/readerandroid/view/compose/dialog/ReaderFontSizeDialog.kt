@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -37,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -65,17 +69,13 @@ fun ReaderFontSize(
     // 内部字号状态
     var fontSize by remember { mutableStateOf(initialFontSize) }
 
-//    // 当弹窗显示/隐藏时同步外部传入的字号
-//    if (true) {
-//        fontSize = initialFontSize
-//    }
 
     // 当内部字号变化时通知外部
     fun handleFontSizeChange(newSize: Int) {
         fontSize = newSize
         onFontSizeChanged(newSize)
     }
-// 右侧滑出的内容面板
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,17 +95,11 @@ fun ReaderFontSize(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-//                                    shape = BorderStyle(
-//                                        bottom = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-//                                    )
-                    ),
+                    ,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.book_open), // 假设存在此图标
+                    painter = painterResource(id = R.drawable.font_size), // 假设存在此图标
                     contentDescription = "字号调整",
                     modifier = Modifier.size(20.dp),
                     tint = MaterialTheme.colorScheme.primary
@@ -123,7 +117,7 @@ fun ReaderFontSize(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Icon(
-                    painter = painterResource(id = R.drawable.book_open), // 假设存在此图标
+                    imageVector = Icons.Filled.Close,
                     contentDescription = "关闭",
                     modifier = Modifier
                         .size(24.dp)
@@ -134,37 +128,12 @@ fun ReaderFontSize(
                 )
             }
 
-            // 字号调整区域
             Column(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                // 预览区域
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                ) {
-                    Text(
-                        text = "预览文本",
-                        fontSize = fontSize.sp,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // 滑块区域
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -199,7 +168,7 @@ fun ReaderFontSize(
                             handleFontSizeChange(newValue.roundToInt())
                         },
                         valueRange = 12f..42f,
-                        steps = 29, // 12到32之间有20个步长（包含两端）
+                        steps = 29,
                         modifier = Modifier.fillMaxWidth(),
                         colors = androidx.compose.material3.SliderDefaults.colors(
                             thumbColor = MaterialTheme.colorScheme.primary,
@@ -211,7 +180,6 @@ fun ReaderFontSize(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 快捷字号按钮
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -244,7 +212,7 @@ fun ReaderFontSize(
                         ) {
                             Text(
                                 text = size.toString(),
-                                fontSize = (size - 2).sp, // 按钮内文字稍小一些
+                                fontSize = (size - 2).sp,
                                 color = if (fontSize == size) {
                                     MaterialTheme.colorScheme.onPrimary
                                 } else {
@@ -259,50 +227,6 @@ fun ReaderFontSize(
     }
 }
 
-/**
- * 简单的使用示例
- */
-@Preview(showBackground = true)
-@Composable
-fun FontSizeAdjustmentPopupDemo() {
-    var isPopupVisible by remember { mutableStateOf(true) }
-    var currentFontSize by remember { mutableStateOf(18) }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        // 触发按钮
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp))
-                .clickable {
-                    isPopupVisible = !isPopupVisible
-                }
-                .padding(12.dp, 8.dp)
-        ) {
-            Text(
-                text = "调整字号",
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-
-        // 显示当前字号
-        Text(
-            text = "当前字号: $currentFontSize",
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            fontSize = currentFontSize.sp
-        )
-
-//        // 字号调整弹窗
-//        ReaderFontSize(
-//            isVisible = isPopupVisible,
-//            onDismiss = { isPopupVisible = false },
-//            initialFontSize = currentFontSize,
-//            onFontSizeChanged = { newSize -> currentFontSize = newSize }
-//        )
-    }
-}
 
 @Composable
 fun ReaderFontSizeDialog(controller: DialogControllerWithAnim){
@@ -341,7 +265,7 @@ fun ReaderFontSizeDialog(controller: DialogControllerWithAnim){
                             onFontSizeChanged = { value ->
                                 viewModel.setTextStyle(
                                     TextStyle(
-                                        lineHeight = style.lineHeight,
+                                        lineHeight = (value + 10).sp,
                                         fontSize = value.sp,
                                         fontFamily = style.fontFamily,
                                         letterSpacing = style.letterSpacing
