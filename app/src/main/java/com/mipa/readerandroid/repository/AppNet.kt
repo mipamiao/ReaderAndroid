@@ -5,6 +5,7 @@ import com.mipa.readerandroid.R
 import com.mipa.readerandroid.base.MyApp
 import com.mipa.readerandroid.model.feature.Chapter
 import com.mipa.readerandroid.repository.nao.BookNao
+import com.mipa.readerandroid.repository.nao.BookmarkNao
 import com.mipa.readerandroid.repository.nao.ChapterNao
 import com.mipa.readerandroid.repository.nao.LibraryNao
 import com.mipa.readerandroid.repository.nao.SearchNao
@@ -40,7 +41,6 @@ object AppNet {
         .build()
 
 
-
     fun userNao(): UserNao {
         return retrofit.create(UserNao::class.java)
     }
@@ -57,7 +57,11 @@ object AppNet {
         return retrofit.create(LibraryNao::class.java)
     }
 
-    fun searchNao(): SearchNao{
+    fun searchNao(): SearchNao {
         return retrofit.create(SearchNao::class.java)
+    }
+
+    fun bookmarkNao(): BookmarkNao{
+        return retrofit.create(BookmarkNao::class.java)
     }
 }

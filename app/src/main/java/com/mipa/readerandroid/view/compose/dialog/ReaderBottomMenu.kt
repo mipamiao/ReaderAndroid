@@ -229,7 +229,7 @@ fun ReaderBottomMenuDialog(controller: DialogControllerWithAnim){
                             .wrapContentHeight(Alignment.Bottom) // 关键：内容贴底
                     ) {
                         ReadingBottomMenu(
-                            onBookmarkSelect = { viewModel.onClickBookmarkItem() },
+                            onBookmarkSelect = { viewModel.onClickOpenBookmarkItem() },
                             onChapterListSelect = { viewModel.onClickChapterListItem() },
                             onFontSelect = { viewModel.onClickFontStyleItem() },
                             onFontSizeSelect = { viewModel.onClickFontSizeItem() },
