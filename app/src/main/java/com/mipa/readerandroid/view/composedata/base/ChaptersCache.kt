@@ -34,6 +34,9 @@ class ChaptersCache {
         onEnd: (Chapter?) -> Unit = {}
     ): ChapterCache {
         if(!checkValue())return ChapterCache()
+
+        if(order == lastGetOrder)return chapterList[leftCacheNumber]
+
         val newStartOrder = order - leftCacheNumber
         val newEndOrder = order + rightCacheNumber
         val tempList = mutableListOf<ChapterCache>()

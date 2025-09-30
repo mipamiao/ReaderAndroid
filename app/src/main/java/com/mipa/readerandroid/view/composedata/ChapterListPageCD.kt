@@ -47,7 +47,7 @@ class ChapterListPageCD : ChaptersShowViewModel() {
     override fun onItemClick(data: ChapterInfo, naviController: NavHostController) {
         chapterNum?.let {
             book.value.bookId?.let { it1 ->
-                data.order?.let { it2 -> CDMap.get<ReaderViewCD>().from(it1, it2, it) }
+                data.order?.let { it2 -> CDMap.get<ReaderViewCD>().from(book.value, it1, it2, it) }
             }
         }
         addLibrary(data)

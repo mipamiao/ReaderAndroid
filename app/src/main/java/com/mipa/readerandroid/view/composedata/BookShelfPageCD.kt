@@ -23,7 +23,7 @@ class BookShelfPageCD : DatasShowViewModel<Library>() {
                 data.chapterInfo?.order?.let { it1 ->
                     book.chaptersCount?.let { it2 ->
                         CDMap.get<ReaderViewCD>().from(
-                            it, it1, it2
+                            book, it, it1, it2
                         )
                     }
                 }

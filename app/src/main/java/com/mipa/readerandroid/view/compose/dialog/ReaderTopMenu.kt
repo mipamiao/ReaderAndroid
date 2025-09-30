@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,16 +35,14 @@ import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderTopMenuDD
 import com.mipa.readerandroid.view.reader.ReaderViewCD
-
 @Composable
-fun ReaderTopMenu(
-    onExitReading: () -> Unit,
-    onComment: () -> Unit,
-    onListenBook: () -> Unit,
-    onAddBookmark: () -> Unit,
-    isVisible: Boolean = true
-) {
+fun ReaderTopMenu() {
+
+    val viewModel = CDMap.get<ReaderTopMenuDD>()
+    val naviController = LocalNavController.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,7 +52,7 @@ fun ReaderTopMenu(
     ) {
         TopMenuIconButton(
             icon = Icons.Filled.ArrowBack,
-            onClick = onExitReading
+            onClick = {viewModel.onClickBack(naviController)}
         )
 
         Row(
@@ -63,19 +62,19 @@ fun ReaderTopMenu(
         ) {
             TopMenuIconButton(
                 icon = Icons.Filled.VolumeUp,
-                onClick = onListenBook,
+                onClick = { viewModel.onClickListenBook() },
                 modifier = Modifier.padding(end = 8.dp)
             )
 
             TopMenuIconButton(
                 icon = Icons.Filled.Comment,
-                onClick = onComment,
+                onClick = { viewModel.onClickComment() },
                 modifier = Modifier.padding(end = 8.dp)
             )
 
             TopMenuIconButton(
                 icon = Icons.Filled.BookmarkBorder,
-                onClick = onAddBookmark
+                onClick = { viewModel.onClickAddBookmark() }
             )
         }
     }
@@ -124,19 +123,9 @@ private fun TopMenuIconButton(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun preview(){
-    MaterialTheme {
-        ReaderTopMenu(onExitReading = {}, onComment = {}, onListenBook = {}, onAddBookmark = {})
-    }
-}
 
 @Composable
 fun ReaderTopMenuDialog(controller: DialogControllerWithAnim){
-    val viewModel = CDMap.get<ReaderViewCD>()
-
-    val naviController = LocalNavController.current
 
     if(controller.canShow()){
         Popup (
@@ -162,12 +151,7 @@ fun ReaderTopMenuDialog(controller: DialogControllerWithAnim){
                         modifier = Modifier
                             .wrapContentHeight(Alignment.Top)
                     ) {
-                        ReaderTopMenu(
-                            onExitReading = {viewModel.onClickBack(naviController)},
-                            onComment = {viewModel.onClickComment()},
-                            onListenBook = {viewModel.onClickListenBook()},
-                            onAddBookmark = {viewModel.onClickAddBookmark()}
-                        )
+                        ReaderTopMenu()
                     }
                 }
             }

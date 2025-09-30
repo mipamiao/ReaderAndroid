@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +23,11 @@ import androidx.compose.ui.unit.sp
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
+import com.mipa.readerandroid.view.compose.dialog.ReaderAddBookmarkDialog
+import com.mipa.readerandroid.view.compose.dialog.ReaderBookmarkDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderBottomMenuDialog
+import com.mipa.readerandroid.view.compose.dialog.ReaderDirDialog
+import com.mipa.readerandroid.view.compose.dialog.ReaderFontSizeDialog
 import com.mipa.readerandroid.view.compose.dialog.ReaderTopMenuDialog
 
 @SuppressLint("RememberReturnType")
@@ -61,10 +64,14 @@ fun ReaderScreen() {
 
     ReaderBottomMenuDialog(viewModel.menuController)
     ReaderTopMenuDialog(viewModel.menuController)
+    ReaderDirDialog(viewModel.dirController)
+    ReaderFontSizeDialog(viewModel.fontSizeController)
+    ReaderAddBookmarkDialog(viewModel.addBookmarkController)
+    ReaderBookmarkDialog(viewModel.bookmarkController)
 
-    val pagerState = rememberPagerState(pageCount = {pages.value.size}, initialPage = viewModel.initialPageIndex) // 总页数
+    val pagerState = rememberPagerState(pageCount = {pages.value.size}) // 总页数
     LaunchedEffect(pages.value) {
-        pagerState.scrollToPage(viewModel.initialPageIndex)
+        if (viewModel.initialPageIndex >= 0) pagerState.scrollToPage(viewModel.initialPageIndex)
     }
 
     Column(modifier = Modifier
@@ -97,7 +104,7 @@ fun ReaderScreen() {
                             } else if (offset.x > screenWidth * 2 / 3) {
                                 viewModel.nextPage(pagerState, coroutineScope)
                             } else {
-                                viewModel.switchMenu()
+                                viewModel.openMenu()
                             }
                         }
                     )
@@ -112,15 +119,12 @@ fun ReaderScreen() {
                     ) {
                         Text(
                             text = pages.value[page],
-                            style = viewModel.textStyle,
+                            style = viewModel.textStyle.value,
                             modifier = Modifier
                         )
                     }
                 }
             }
-
         }
-
     }
-
 }
