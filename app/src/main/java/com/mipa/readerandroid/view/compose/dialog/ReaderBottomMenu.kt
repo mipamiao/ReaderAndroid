@@ -32,28 +32,13 @@ import androidx.compose.ui.window.Popup
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderBotttomMenuDD
 import com.mipa.readerandroid.view.reader.ReaderViewCD
 
-@Preview
 @Composable
-fun ReadingBottomMenuPreview() {
-    MaterialTheme {
-        ReadingBottomMenu(
-            onFontSelect = { },
-            onFontSizeSelect = { },
-            onChapterListSelect = { },
-            onBookmarkSelect = { }
-        )
-    }
-}
+fun ReadingBottomMenu() {
 
-@Composable
-fun ReadingBottomMenu(
-    onFontSelect: () -> Unit,
-    onFontSizeSelect: () -> Unit,
-    onChapterListSelect: () -> Unit,
-    onBookmarkSelect: () -> Unit
-) {
+    val viewModel = CDMap.get<ReaderBotttomMenuDD>()
     // 动画颜色状态
     val backgroundColor by animateColorAsState(
         targetValue = MaterialTheme.colorScheme.surface,
@@ -103,36 +88,34 @@ fun ReadingBottomMenu(
             MenuItem(
                 icon = Icons.Filled.TextFields,
                 label = "字体",
-                onClick = onFontSelect
+                onClick = {viewModel.onClickFontStyleItem()}
             )
 
             // 字号选项
             MenuItem(
                 icon = Icons.Filled.FormatSize,
                 label = "字号",
-                onClick = onFontSizeSelect
+                onClick = {viewModel.onClickFontSizeItem()}
             )
 
             // 目录选项
             MenuItem(
                 icon = Icons.Filled.List,
                 label = "目录",
-                onClick = onChapterListSelect
+                onClick = {viewModel.onClickChapterListItem()}
             )
 
             // 书签选项
             MenuItem(
                 icon = Icons.Filled.Bookmark,
                 label = "书签",
-                onClick = onBookmarkSelect
+                onClick = {viewModel.onClickOpenBookmarkItem()}
             )
         }
     }
 }
 
-/**
- * 菜单项组件 - 图标在上，文字在下 - 紧凑版
- */
+
 @Composable
 private fun MenuItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -181,16 +164,16 @@ private fun MenuItem(
                 imageVector = icon,
                 contentDescription = label,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp) // 从24.dp减少到20.dp
+                modifier = Modifier.size(20.dp)
             )
         }
-        // 文字标签 - 减少间距并调整文字大小
-        Spacer(modifier = Modifier.height(4.dp)) // 从6.dp减少到4.dp
+
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp), // 添加更小的字体大小
+            style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 4.dp) // 从8.dp减少到4.dp
+            modifier = Modifier.padding(horizontal = 4.dp)
         )
     }
 }
@@ -228,12 +211,7 @@ fun ReaderBottomMenuDialog(controller: DialogControllerWithAnim){
                             .fillMaxWidth()
                             .wrapContentHeight(Alignment.Bottom) // 关键：内容贴底
                     ) {
-                        ReadingBottomMenu(
-                            onBookmarkSelect = { viewModel.onClickOpenBookmarkItem() },
-                            onChapterListSelect = { viewModel.onClickChapterListItem() },
-                            onFontSelect = { viewModel.onClickFontStyleItem() },
-                            onFontSizeSelect = { viewModel.onClickFontSizeItem() },
-                        )
+                        ReadingBottomMenu()
                     }
                 }
             }

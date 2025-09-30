@@ -63,35 +63,17 @@ import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
-import com.mipa.readerandroid.view.reader.BookmarkPopupCD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderAddBookmarkDD
 
 
 @Composable
-fun ReaderAddBookmark(
-    onDismiss: () -> Unit,
-    onSave: (String) -> Unit,
-    chapterTitle: String = "当前章节",
-    note: String = ""
-) {
-    val viewModel = CDMap.get<BookmarkPopupCD>()
-    val isLoading = viewModel.isLoading.collectAsState()
+fun ReaderAddBookmark() {
 
-    // 备注文本状态
-    var noteText by remember { mutableStateOf(TextFieldValue(note)) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() }
+    val viewModel = CDMap.get<ReaderAddBookmarkDD>()
+    val isLoading = viewModel.getBookmarkLoadState().collectAsState()
 
+    var noteText  = viewModel.note
 
-    LaunchedEffect(isLoading.value) {
-        noteText = TextFieldValue(viewModel.getCurrentNote())
-    }
-
-    // 保存书签备注
-    fun handleSave() {
-        onSave(noteText.text)
-        noteText = TextFieldValue("") // 清空输入
-        onDismiss()
-    }
     Box(
         modifier = Modifier
             .wrapContentHeight()
@@ -106,7 +88,7 @@ fun ReaderAddBookmark(
         contentAlignment = Alignment.TopCenter
     ) {
         Column {
-            // 标题栏
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,13 +119,13 @@ fun ReaderAddBookmark(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            onDismiss()
+                            viewModel.dialogController.dismiss()
                         },
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            // 内容区域
+
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -152,7 +134,7 @@ fun ReaderAddBookmark(
                 if (isLoading.value) {
                     LoadingCompose()
                 } else {
-                    // 章节信息显示
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -171,7 +153,7 @@ fun ReaderAddBookmark(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         Text(
-                            text = chapterTitle,
+                            text = viewModel.chapterInfo?.title?:"",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
@@ -180,7 +162,7 @@ fun ReaderAddBookmark(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // 备注输入区域
+
                     Column {
                         Text(
                             text = "备注",
@@ -191,8 +173,8 @@ fun ReaderAddBookmark(
                         )
 
                         BasicTextField(
-                            value = noteText,
-                            onValueChange = { noteText = it },
+                            value = noteText.value,
+                            onValueChange = { noteText.value = it },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(150.dp)
@@ -214,7 +196,7 @@ fun ReaderAddBookmark(
                         ) {
                                 innerTextField ->
                             Box(modifier = Modifier.padding(4.dp)) {
-                                if (noteText.text.isEmpty()) {
+                                if (noteText.value.isEmpty()) {
                                     Text(
                                         text = "输入备注信息（选填）",
                                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -229,17 +211,17 @@ fun ReaderAddBookmark(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // 底部按钮区域
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        // 取消按钮
+
                         Box(
                             modifier = Modifier
                                 .padding(4.dp)
                                 .clickable {
-                                    onDismiss()
+                                    viewModel.dialogController.dismiss()
                                 }
                                 .padding(12.dp, 8.dp)
                         ) {
@@ -249,7 +231,7 @@ fun ReaderAddBookmark(
                             )
                         }
 
-                        // 保存按钮
+
                         Box(
                             modifier = Modifier
                                 .padding(4.dp)
@@ -258,7 +240,7 @@ fun ReaderAddBookmark(
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .clickable {
-                                    handleSave()
+                                    viewModel.onSaveNoteClick()
                                 }
                                 .padding(16.dp, 8.dp)
                         ) {
@@ -278,7 +260,6 @@ fun ReaderAddBookmark(
 
 @Composable
 fun ReaderAddBookmarkDialog(controller: DialogControllerWithAnim){
-    val viewModel = CDMap.get<BookmarkPopupCD>()
 
     if(controller.canShow()){
         Dialog (
@@ -286,8 +267,8 @@ fun ReaderAddBookmarkDialog(controller: DialogControllerWithAnim){
                 controller.dismiss()
             },
             properties = DialogProperties(
-                usePlatformDefaultWidth = false, // 避免键盘被挤掉
-                decorFitsSystemWindows = false   // 让系统自动调整
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
             )
         ) {
             Box(
@@ -307,12 +288,7 @@ fun ReaderAddBookmarkDialog(controller: DialogControllerWithAnim){
                         modifier = Modifier
                             .wrapContentHeight(Alignment.Top)
                     ) {
-                        ReaderAddBookmark(
-                            onDismiss = {controller.dismiss()},
-                            onSave = viewModel.onSaveNoteClick,
-                            chapterTitle = viewModel.nowChapterTitle,
-                            note = viewModel.getCurrentNote()
-                        )
+                        ReaderAddBookmark()
                     }
                 }
             }

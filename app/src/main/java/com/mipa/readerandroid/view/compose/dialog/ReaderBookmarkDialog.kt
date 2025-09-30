@@ -56,25 +56,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.model.feature.Bookmark
+import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
-import com.mipa.readerandroid.view.reader.BookmarkPopupCD
-
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderBookmarkDD
 
 
 @Composable
-fun ReaderBookmark(
-    onDismiss: () -> Unit,
-    bookmarks: List<Bookmark>,
-    onBookmarkSelect: (Bookmark) -> Unit,
-    onBookmarkDelete: (Bookmark) -> Unit
-) {
-    val viewModel = CDMap.get<BookmarkPopupCD>()
+fun ReaderBookmark() {
+    val viewModel = CDMap.get<ReaderBookmarkDD>()
     val isLoading = viewModel.isLoading.collectAsState()
+    val bookmarks = viewModel.datas
+
+    val naviController = LocalNavController.current
 
     LaunchedEffect(Unit) {
         viewModel.loadAlllDatas()
     }
+
     Box(
         modifier = Modifier
             .fillMaxHeight()
@@ -128,7 +127,7 @@ fun ReaderBookmark(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            onDismiss()
+                            viewModel.dialogController.dismiss()
                         },
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -183,8 +182,8 @@ fun ReaderBookmark(
                         items(bookmarks) { bookmark ->
                             BookmarkItem(
                                 bookmark = bookmark,
-                                onSelect = { onBookmarkSelect(bookmark) },
-                                onDelete = { onBookmarkDelete(bookmark) }
+                                onSelect = { viewModel.onItemClick(bookmark, naviController) },
+                                onDelete = { viewModel.onDelClick(bookmark) }
                             )
                         }
                     }
@@ -331,7 +330,7 @@ fun BookmarkItem(
 
 @Composable
 fun ReaderBookmarkDialog(controller: DialogControllerWithAnim){
-    val viewModel = CDMap.get<BookmarkPopupCD>()
+
     if(controller.canShow()){
         Popup (
             onDismissRequest = {
@@ -358,14 +357,7 @@ fun ReaderBookmarkDialog(controller: DialogControllerWithAnim){
                         modifier = Modifier
                             .wrapContentHeight(Alignment.Top)
                     ) {
-                        ReaderBookmark(
-                            bookmarks = viewModel.datas,
-                            onDismiss = { controller.dismiss() },
-                            onBookmarkSelect = viewModel.onBookmarkItemClick,
-                            onBookmarkDelete = { bookmark ->
-                                viewModel.onDelClick(bookmark)
-                            }
-                        )
+                        ReaderBookmark()
                     }
                 }
             }

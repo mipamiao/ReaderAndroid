@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,28 +26,27 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Popup
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mipa.readerandroid.R
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.model.feature.ChapterInfo
+import com.mipa.readerandroid.view.compose.LocalNavController
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
 import com.mipa.readerandroid.view.compose.base.LoadingCompose
-import com.mipa.readerandroid.view.composedata.DatasShowAllViewModel.Companion.TAG
-import com.mipa.readerandroid.view.reader.DirPopupCD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderDirDD
 
 @Composable
-fun ReaderDir(
-    chapters: List<ChapterInfo>,
-    currentChapterIndex: Int,
-    onChapterSelect: (ChapterInfo) -> Unit,
-    onClose: () -> Unit
-) {
+fun ReaderDir() {
 
-    val viewModel = CDMap.get<DirPopupCD>()
+    val viewModel = CDMap.get<ReaderDirDD>()
 
     val listState = rememberLazyListState()
+    val chapters = viewModel.datas
     val isLoading = viewModel.isLoading.collectAsState()
+
+    val currentChapterIndex =  viewModel.chapterInfo?.order?:0
+
+    val naviController = LocalNavController.current
 
 
     LaunchedEffect(Unit) {
@@ -94,7 +92,9 @@ fun ReaderDir(
                         painter = painterResource(R.drawable.book_open),
                         contentDescription = "目录",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(18.dp).clickable { viewModel.loadAlllDatas() }
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clickable { viewModel.loadAlllDatas() }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -110,7 +110,9 @@ fun ReaderDir(
                             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                             shape = RoundedCornerShape(16.dp)
                         )
-                        .clickable(onClick = onClose)
+                        .clickable(onClick = {
+                            viewModel.dialogController.dismiss()
+                        })
                         .padding(4.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -122,9 +124,9 @@ fun ReaderDir(
                     )
                 }
             }
-            if(isLoading.value){
+            if (isLoading.value) {
                 LoadingCompose()
-            }else {
+            } else {
                 if (chapters.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -148,21 +150,16 @@ fun ReaderDir(
                             ChapterItemView(
                                 chapter = it,
                                 isCurrent = chapters.indexOf(it) == currentChapterIndex,
-                                onClick = { onChapterSelect(it) }
+                                onClick = { viewModel.onItemClick(it, naviController) }
                             )
                         }
                     }
                 }
             }
-
-
         }
     }
 }
 
-/**
- * 章节列表项组件
- */
 @Composable
 private fun ChapterItemView(
     chapter: ChapterInfo,
@@ -215,10 +212,9 @@ private fun ChapterItemView(
 }
 
 @Composable
-fun ReaderDirDialog(controller: DialogControllerWithAnim){
-    val viewModel  = CDMap.get<DirPopupCD>()
+fun ReaderDirDialog(controller: DialogControllerWithAnim) {
 
-    if (controller.canShow()){
+    if (controller.canShow()) {
         Popup(alignment = Alignment.CenterStart) {
             Box(
                 modifier = Modifier
@@ -226,23 +222,18 @@ fun ReaderDirDialog(controller: DialogControllerWithAnim){
                     .wrapContentWidth(Alignment.Start)
             ) {
                 AnimatedVisibilityWithCallback(
-                    name = "ReaderBottomMenuDialog",
+                    name = "ReaderDirDialog",
                     visible = controller.isShow,
                     enter = slideInHorizontally(animationSpec = tween(durationMillis = 300)) { fullHeight -> -fullHeight },
                     exit = slideOutHorizontally(animationSpec = tween(durationMillis = 300)) { fullHeight -> -fullHeight },
-                    onEnterEnd = {controller.endShowing()},
-                    onExitEnd = {controller.endDismissing()}
+                    onEnterEnd = { controller.endShowing() },
+                    onExitEnd = { controller.endDismissing() }
                 ) {
                     Surface(
                         modifier = Modifier
                             .wrapContentWidth(Alignment.Start)
                     ) {
-                        ReaderDir(
-                            chapters = viewModel.datas,
-                            currentChapterIndex = viewModel.nowChapterIndex,
-                            onChapterSelect = viewModel.onDirItemClick,
-                            onClose = {controller.dismiss()}
-                        )
+                        ReaderDir()
                     }
                 }
             }

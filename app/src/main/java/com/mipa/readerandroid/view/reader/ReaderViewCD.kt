@@ -27,6 +27,12 @@ import com.mipa.readerandroid.model.feature.Bookmark
 import com.mipa.readerandroid.model.feature.ChapterInfo
 import com.mipa.readerandroid.service.BookmarkService
 import com.mipa.readerandroid.service.CustomedSettingService
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderAddBookmarkDD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderBookmarkDD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderBotttomMenuDD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderDirDD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderFontSizeDD
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderTopMenuDD
 import com.mipa.readerandroid.view.composedata.base.ChapterCache
 import com.mipa.readerandroid.view.composedata.base.ChaptersCache
 import kotlinx.coroutines.CoroutineScope
@@ -58,6 +64,13 @@ class ReaderViewCD: BaseCD() {
     val addBookmarkController = DialogControllerWithAnim()
     val bookmarkController = DialogControllerWithAnim()
 
+    val addBookmarkDD = CDMap.get<ReaderAddBookmarkDD>()
+    val bookmarkDD = CDMap.get<ReaderBookmarkDD>()
+    val dirDD = CDMap.get<ReaderDirDD>()
+    val topMenuDD = CDMap.get<ReaderTopMenuDD>()
+    val bottomMenuDD = CDMap.get<ReaderBotttomMenuDD>()
+    val fontSizeDD = CDMap.get<ReaderFontSizeDD>()
+
 
     val chaptersCache = ChaptersCache()
     var chapterCache = ChapterCache()
@@ -73,9 +86,6 @@ class ReaderViewCD: BaseCD() {
 
     val readerSize =  mutableStateOf(IntSize(0,0))
     val pages = mutableStateOf(emptyList<String>())
-    val dirPopupCD = CDMap.get<DirPopupCD>()
-    val bookmarkPopupCD = CDMap.get<BookmarkPopupCD>()
-
 
     val loadChapterTrigger = EffectController()
     var textMeasure: TextMeasurer? = null
@@ -98,11 +108,6 @@ class ReaderViewCD: BaseCD() {
     }
 
 
-    fun from(bookId: String?, chapterId: String?){
-        this.bookId = bookId
-        this.chapterId = chapterId
-    }
-
     fun from(book: Book, bookId: String, order: Int, orderNum: Int) {
         this.book = book
         this.bookId = bookId
@@ -114,6 +119,8 @@ class ReaderViewCD: BaseCD() {
 
         initialBookmark()
         initialDir()
+        initalMenu()
+        initalFontStyle()
     }
 
 
@@ -218,62 +225,6 @@ class ReaderViewCD: BaseCD() {
         menuController.show()
     }
 
-
-    fun onClickFontStyleItem() {
-
-    }
-
-    fun onClickFontSizeItem() {
-        clearAllDialog()
-        fontSizeController.show()
-    }
-
-    fun onClickChapterListItem() {
-        menuController.dismiss()
-
-        dirController.show()
-    }
-
-    fun onClickOpenBookmarkItem() {
-        menuController.dismiss()
-        bookmarkController.show()
-    }
-
-    fun onClickBack(naviController: NavHostController){
-        naviController.popBackStack()
-    }
-
-    fun onClickListenBook(){
-
-    }
-
-    fun onClickComment(){
-
-    }
-
-    fun onClickAddBookmark() {
-        menuController.dismiss()
-        bookmarkPopupCD.nowChapterTitle = title.value
-        bookmarkPopupCD.nowChapterIndex = order.value
-        addBookmarkController.show()
-    }
-
-    fun onClickDirItem(chapterInfo: ChapterInfo){
-        clearAllDialog()
-        chapterInfo.order?.let {
-            _order.value = it
-            loadChapter(1)
-        }
-    }
-
-    fun onClickBookmarkItem(bookmark: Bookmark){
-        clearAllDialog()
-        bookmark.order?.let {
-            _order.value = it
-            loadChapter(1)
-        }
-    }
-
     fun clearAllDialog(): Boolean {
         return menuController.dismiss() ||
                 dirController.dismiss()||
@@ -308,38 +259,27 @@ class ReaderViewCD: BaseCD() {
     }
 
     fun initialBookmark() {
-        book?.let {
-            bookmarkPopupCD.from(it, order.value, title.value, itemCallback = { item ->
-                onClickBookmarkItem(item)
-            }, addCallback = { note ->
-                val dto = BookmarkRequestDto()
-                dto.bookId = bookId
-                dto.chapterId = chapterId
-                dto.chapterTitle = title.value
-                dto.order = order.value
-                dto.note = note
-                viewModelScope.launch {
-                    val res = withContext(Dispatchers.IO) {
-                        ConstValue.delay()
-                        val bookmark = bookmarkPopupCD.getNowBookmark()
-                        bookmark?.let {
-                            bookmark.id?.let { it1 -> BookmarkService.updateBookmark(dto, it1) }
-                        } ?: run{
-                            BookmarkService.addBookmark(dto)
-                        }
-                    }
-                    ConstValue.showOPstate(res != null)
-                }
-            })
-        }
+        addBookmarkDD.init(addBookmarkController)
+        book?.let { bookmarkDD.init(it, bookmarkController) }
     }
 
     fun initialDir() {
         book?.let {
-            dirPopupCD.from(it, order.value) { info ->
-                onClickDirItem(info)
-            }
+            dirDD.init(it, dirController)
         }
+    }
+
+    fun initalMenu(){
+        topMenuDD.init(menuController)
+        bottomMenuDD.init(menuController)
+    }
+
+    fun initalFontStyle(){
+        fontSizeDD.init(fontSizeController)
+    }
+
+    fun setOrder(value: Int){
+        _order.value = value
     }
 }
 
