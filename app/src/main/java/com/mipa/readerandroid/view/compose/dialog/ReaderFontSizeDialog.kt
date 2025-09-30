@@ -54,26 +54,22 @@ import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.dialogcontroller.DialogController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
 import com.mipa.readerandroid.view.compose.base.AnimatedVisibilityWithCallback
+import com.mipa.readerandroid.view.compose.dialogdata.ReaderFontSizeDD
 import com.mipa.readerandroid.view.reader.ReaderViewCD
 import kotlin.math.roundToInt
 
 
 @Composable
-fun ReaderFontSize(
-    onDismiss: () -> Unit,
-    initialFontSize: Int = 18,
-    onFontSizeChanged: (Int) -> Unit
-) {
+fun ReaderFontSize() {
 
 
+    val viewModel = CDMap.get<ReaderFontSizeDD>()
     // 内部字号状态
-    var fontSize by remember { mutableStateOf(initialFontSize) }
+    var fontSize = viewModel.fontSize
 
-
-    // 当内部字号变化时通知外部
-    fun handleFontSizeChange(newSize: Int) {
-        fontSize = newSize
-        onFontSizeChanged(newSize)
+    fun handleFontSizeChange(newSize: Int){
+        fontSize.value = newSize
+        viewModel.onFontSizeChanged()
     }
 
     Box(
@@ -122,7 +118,7 @@ fun ReaderFontSize(
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            onDismiss()
+                            viewModel.dialogController.dismiss()
                         },
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -147,7 +143,7 @@ fun ReaderFontSize(
                         )
 
                         Text(
-                            text = "$fontSize",
+                            text = "${fontSize.value}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -163,9 +159,9 @@ fun ReaderFontSize(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Slider(
-                        value = fontSize.toFloat(),
+                        value = fontSize.value.toFloat(),
                         onValueChange = { newValue ->
-                            handleFontSizeChange(newValue.roundToInt())
+                            handleFontSizeChange(newValue.toInt())
                         },
                         valueRange = 12f..42f,
                         steps = 29,
@@ -189,7 +185,7 @@ fun ReaderFontSize(
                             modifier = Modifier
                                 .size(40.dp)
                                 .background(
-                                    color = if (fontSize == size) {
+                                    color = if (fontSize.value == size) {
                                         MaterialTheme.colorScheme.primary
                                     } else {
                                         MaterialTheme.colorScheme.surfaceVariant
@@ -198,7 +194,7 @@ fun ReaderFontSize(
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = if (fontSize == size) {
+                                    color = if (fontSize.value == size) {
                                         MaterialTheme.colorScheme.primary
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
@@ -213,7 +209,7 @@ fun ReaderFontSize(
                             Text(
                                 text = size.toString(),
                                 fontSize = (size - 2).sp,
-                                color = if (fontSize == size) {
+                                color = if (fontSize.value == size) {
                                     MaterialTheme.colorScheme.onPrimary
                                 } else {
                                     MaterialTheme.colorScheme.onBackground
@@ -230,10 +226,6 @@ fun ReaderFontSize(
 
 @Composable
 fun ReaderFontSizeDialog(controller: DialogControllerWithAnim){
-
-     val viewModel = CDMap.get<ReaderViewCD>()
-
-    val style = viewModel.textStyle.value
 
     if(controller.canShow()){
         Popup (
@@ -259,20 +251,7 @@ fun ReaderFontSizeDialog(controller: DialogControllerWithAnim){
                         modifier = Modifier
                             .wrapContentHeight(Alignment.Bottom)
                     ) {
-                        ReaderFontSize(
-                            onDismiss = { controller.dismiss() },
-                            initialFontSize = style.fontSize.value.toInt(),
-                            onFontSizeChanged = { value ->
-                                viewModel.setTextStyle(
-                                    TextStyle(
-                                        lineHeight = (value + 10).sp,
-                                        fontSize = value.sp,
-                                        fontFamily = style.fontFamily,
-                                        letterSpacing = style.letterSpacing
-                                    )
-                                )
-                            }
-                        )
+                        ReaderFontSize()
                     }
                 }
             }
