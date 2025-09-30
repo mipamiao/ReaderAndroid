@@ -3,7 +3,6 @@ package com.mipa.readerandroid.view.reader
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.AnnotatedString
@@ -15,24 +14,27 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.mipa.readerandroid.base.BaseCD
 import com.mipa.readerandroid.base.CDMap
 import com.mipa.readerandroid.base.ConstValue
 import com.mipa.readerandroid.base.EffectController.EffectController
 import com.mipa.readerandroid.base.dialogcontroller.DialogControllerWithAnim
+import com.mipa.readerandroid.model.dto.BookmarkRequestDto
 import com.mipa.readerandroid.model.feature.Book
+import com.mipa.readerandroid.model.feature.Bookmark
 import com.mipa.readerandroid.model.feature.ChapterInfo
+import com.mipa.readerandroid.service.BookmarkService
 import com.mipa.readerandroid.service.CustomedSettingService
-import com.mipa.readerandroid.view.composedata.ChaptersShowViewModel
 import com.mipa.readerandroid.view.composedata.base.ChapterCache
 import com.mipa.readerandroid.view.composedata.base.ChaptersCache
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
-import kotlin.math.max
+import kotlinx.coroutines.withContext
 import kotlin.math.min
 
 class ReaderViewCD: BaseCD() {
@@ -53,6 +55,8 @@ class ReaderViewCD: BaseCD() {
     val menuController = DialogControllerWithAnim()
     val dirController = DialogControllerWithAnim()
     val fontSizeController = DialogControllerWithAnim()
+    val addBookmarkController = DialogControllerWithAnim()
+    val bookmarkController = DialogControllerWithAnim()
 
 
     val chaptersCache = ChaptersCache()
@@ -70,6 +74,7 @@ class ReaderViewCD: BaseCD() {
     val readerSize =  mutableStateOf(IntSize(0,0))
     val pages = mutableStateOf(emptyList<String>())
     val dirPopupCD = CDMap.get<DirPopupCD>()
+    val bookmarkPopupCD = CDMap.get<BookmarkPopupCD>()
 
 
     val loadChapterTrigger = EffectController()
@@ -106,6 +111,9 @@ class ReaderViewCD: BaseCD() {
 
         chaptersCache.orderNum = orderNum
         chaptersCache.bookId = bookId
+
+        initialBookmark()
+        initialDir()
     }
 
 
@@ -160,6 +168,7 @@ class ReaderViewCD: BaseCD() {
             chapter?.let { chapter
                 chapter.content?.let {
                     _content.value = it
+                    chapterId = chapter.chapterInfo?.chapterId
                     sliceContent()
                     when (isNextOrLast) {
                         1 -> initialPageIndex = 0
@@ -221,16 +230,13 @@ class ReaderViewCD: BaseCD() {
 
     fun onClickChapterListItem() {
         menuController.dismiss()
-        book?.let {
-            dirPopupCD.from(it, order.value) { info ->
-                onClickDirItem(info)
-            }
-        }
+
         dirController.show()
     }
 
-    fun onClickBookmarkItem() {
-
+    fun onClickOpenBookmarkItem() {
+        menuController.dismiss()
+        bookmarkController.show()
     }
 
     fun onClickBack(naviController: NavHostController){
@@ -245,8 +251,11 @@ class ReaderViewCD: BaseCD() {
 
     }
 
-    fun onClickAddBookmark(){
-
+    fun onClickAddBookmark() {
+        menuController.dismiss()
+        bookmarkPopupCD.nowChapterTitle = title.value
+        bookmarkPopupCD.nowChapterIndex = order.value
+        addBookmarkController.show()
     }
 
     fun onClickDirItem(chapterInfo: ChapterInfo){
@@ -257,10 +266,20 @@ class ReaderViewCD: BaseCD() {
         }
     }
 
+    fun onClickBookmarkItem(bookmark: Bookmark){
+        clearAllDialog()
+        bookmark.order?.let {
+            _order.value = it
+            loadChapter(1)
+        }
+    }
+
     fun clearAllDialog(): Boolean {
         return menuController.dismiss() ||
                 dirController.dismiss()||
-                fontSizeController.dismiss()
+                fontSizeController.dismiss()||
+                addBookmarkController.dismiss()||
+                bookmarkController.dismiss()
     }
 
     fun setTextStyle(style: TextStyle) {
@@ -286,6 +305,41 @@ class ReaderViewCD: BaseCD() {
 
     fun saveReaderSetting() {
         CustomedSettingService.readerFontSize.set(textStyle.value.fontSize.value.toInt())
+    }
+
+    fun initialBookmark() {
+        book?.let {
+            bookmarkPopupCD.from(it, order.value, title.value, itemCallback = { item ->
+                onClickBookmarkItem(item)
+            }, addCallback = { note ->
+                val dto = BookmarkRequestDto()
+                dto.bookId = bookId
+                dto.chapterId = chapterId
+                dto.chapterTitle = title.value
+                dto.order = order.value
+                dto.note = note
+                viewModelScope.launch {
+                    val res = withContext(Dispatchers.IO) {
+                        ConstValue.delay()
+                        val bookmark = bookmarkPopupCD.getNowBookmark()
+                        bookmark?.let {
+                            bookmark.id?.let { it1 -> BookmarkService.updateBookmark(dto, it1) }
+                        } ?: run{
+                            BookmarkService.addBookmark(dto)
+                        }
+                    }
+                    ConstValue.showOPstate(res != null)
+                }
+            })
+        }
+    }
+
+    fun initialDir() {
+        book?.let {
+            dirPopupCD.from(it, order.value) { info ->
+                onClickDirItem(info)
+            }
+        }
     }
 }
 
